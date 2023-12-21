@@ -2,7 +2,7 @@
 $GLOBALS['site_id'] = get_current_blog_id();
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 /**
- * @method seo_autotool_call_table_installer
+ * @method royalty_calculator_table_installer
  * @brief This function is used to create tables if tables are not exists into DB whenever plugin get activated.
  * @global $wpdb
  */

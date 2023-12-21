@@ -2,7 +2,7 @@
 function royalty_calculator_list()
 {
 	global $wpdb;
-	$shortcode=$wpdb->get_results("SELECT * FROM content_slider",ARRAY_A);
+	$shortcode=$wpdb->get_results("SELECT * FROM royalty_report",ARRAY_A);
 	require_once(plugin_dir_path(__FILE__) . 'includes/royalty_list.php');	
 }
 
@@ -13,9 +13,6 @@ function content_list()
 {
 	global $wpdb;
 	$shortcode=$wpdb->get_results("SELECT * FROM content_data",ARRAY_A);
-
-	
-
 	require_once(plugin_dir_path(__FILE__) . 'includes/content_list.php');	
 }
 
@@ -26,10 +23,10 @@ function create_quarter_report()
 {
 	global $wpdb;
 	$shortcode=array();
-	$data=$wpdb->get_results("SELECT * FROM content_data ",ARRAY_A);
+	$data=$wpdb->get_results("SELECT * FROM royalty_report ",ARRAY_A);
 	if(isset($_GET['id'])){
 		$id=$_GET['id'];
-		$shortcode=$wpdb->get_row("SELECT * FROM content_slider WHERE id=".$id,ARRAY_A);
+		$shortcode=$wpdb->get_row("SELECT * FROM royalty_report WHERE id=".$id,ARRAY_A);
 
 		require_once(plugin_dir_path(__FILE__) . 'includes/create_quarter_report.php');	
 	}else{
@@ -41,62 +38,38 @@ function create_quarter_report()
 add_action('wp_ajax_nopriv_create_quarter_report', 'create_quarter_report');
 add_action('wp_ajax_add_create_quarter_report', 'create_quarter_report');
 
-function addcontentslider()
+function addreportdata()
 {
 	global $wpdb;
 	$return = "success";
-	$title = isset($_POST['title']) ? $_POST['title'] : '';
-	$slider_name = isset($_POST['slider_name']) ? $_POST['slider_name'] : '';
-	$button_url = isset($_POST['button_url']) ? $_POST['button_url'] : '';
-	$button_text = isset($_POST['button_text']) ? $_POST['button_text'] : '';
-	$content = isset($_POST['content']) ? $_POST['content'] : '';
-	$last_slide_status = isset($_POST['last_slide_status']) ? $_POST['last_slide_status'] : '';
+	$quarter_report_name = isset($_POST['quarter_report_name']) ? $_POST['quarter_report_name'] : '';
+	$quarter = isset($_POST['quarter']) ? $_POST['quarter'] : '';
+	$quarter_year = isset($_POST['quarter_year']) ? $_POST['quarter_year'] : '';
 	$id = isset($_POST['edit_id']) ? $_POST['edit_id'] : $_GET['id'];
-	$content_slider_id=isset($_POST['content_slider_id']) ? $_POST['content_slider_id'] : '';
-
 	if(empty($id)){
 		$id = 0;
 	}
 
-	$content_data = $wpdb->get_row("SELECT * FROM content_slider WHERE id=".$id,ARRAY_A);
+	$content_data = $wpdb->get_row("SELECT * FROM royalty_report WHERE id=".$id,ARRAY_A);
 
 	if(!empty($content_data)){
-		$wpdb->update('content_slider', array(
-			'name' => stripslashes($title),
-			'slider_name'=>$slider_name,
-			'content' => stripslashes($content),
-			'button_text'=>$button_text,
-			'button_url'=>$button_url,
-			'content_slider_id'=>implode(',',$content_slider_id),
-			'last_slide_status'=>$last_slide_status
+		$wpdb->update('royalty_report', array(
+			'quarter_report_name' => $quarter_report_name,
+			'quarter'=>$quarter,
+			'quarter_year' => $quarter_year
 		),array('id'=>$id));
 		echo json_encode(array('status' => $return));
 		wp_die();
 	}else{
-		$wpdb->insert('content_slider', array(
-			'name' => stripslashes($title),
-			'slider_name'=>$slider_name,
-			'content' => stripslashes($content),
-			'button_text'=>$button_text,
-			'button_url'=>$button_url,
-			'content_slider_id'=>implode(',',$content_slider_id),
-			'last_slide_status'=>$last_slide_status
+		$wpdb->insert('royalty_report', array(
+			'quarter_report_name' => $quarter_report_name,
+			'quarter'=>$quarter,
+			'quarter_year' => $quarter_year
 		));
 		$lastId = $wpdb->insert_id;
 		if ($wpdb->last_error != "") {
 			$return = $wpdb->last_error;
 		}
-		if(!empty($content)){
-			$val="true";
-		}else{
-			$val="false";
-		}
-
-		$shortcode='[content id='.$lastId.' left-content="'.$val.'"]';
-		$wpdb->update('content_slider', array(
-			'content_shortcode' => $shortcode,
-
-		),array('id'=>$lastId));
 		echo json_encode(array('status' => $return));
 		wp_die();
 	}
@@ -104,8 +77,8 @@ function addcontentslider()
 	wp_die();
 }
 
-add_action('wp_ajax_nopriv_addcontentslider', 'addcontentslider');
-add_action('wp_ajax_addcontentslider', 'addcontentslider');
+add_action('wp_ajax_nopriv_addreportdata', 'addreportdata');
+add_action('wp_ajax_addreportdata', 'addreportdata');
 
 function delete_multiple_content()
 {
@@ -137,17 +110,17 @@ function delete_multiple_contentdata()
 add_action('wp_ajax_nopriv_delete_multiple_contentdata', 'delete_multiple_contentdata');
 add_action('wp_ajax_delete_multiple_contentdata', 'delete_multiple_contentdata');
 
-function delete_shortcode_content()
+function delete_selected_report()
 {
 	global $wpdb;
 	$id=$_POST['id'];
-	$wpdb->delete('content_slider',array('id'=>$id));
+	$wpdb->delete('royalty_report',array('id'=>$id));
 	echo json_encode(array('status' => "success"));
 	wp_die();
 }
 
-add_action('wp_ajax_nopriv_delete_shortcode_content', 'delete_shortcode_content');
-add_action('wp_ajax_delete_shortcode_content', 'delete_shortcode_content');
+add_action('wp_ajax_nopriv_delete_selected_report', 'delete_selected_report');
+add_action('wp_ajax_delete_selected_report', 'delete_selected_report');
 
 function delete_shortcode_contentdata()
 {

@@ -46,14 +46,11 @@ var pathname = window.location.pathname;
 var origin = window.location.origin;
 
 $(document).on('click', '#checkAll', function (){
-
 	$('input:checkbox').not(this).prop('checked', this.checked);
 });
 
-
 function delete_image_static(val)
 {
-	
 	$('#img_wrp'+val).remove();
 	var new_image=$('#image_url').val();
 	var arr=new_image.split(",");
@@ -85,7 +82,7 @@ function delete_multiple_content()
     	if (isDelete == true) {
            // AJAX Request
            $.ajax({
-           	url: contentcallajax.ajaxurl,
+           	url: royaltycallajax.ajaxurl,
            	type: 'POST',
            	data: { action: 'delete_multiple_content',post_id: post_arr},
            	success: function(response){
@@ -96,19 +93,19 @@ function delete_multiple_content()
    } 
 }
 
-function delete_content_shortcode(id)
+function delete_selected_report(id)
 	{
 		var id = id;
 		if (confirm('Are you sure you want to delete this?'))
 		{
 			$.ajax(
 			{
-				url: contentcallajax.ajaxurl,
+				url: royaltycallajax.ajaxurl,
 				method: "POST",
 
 				data:
 				{
-					action: 'delete_shortcode_content',
+					action: 'delete_selected_report',
 					id: id,
 				},
 				beforeSend: function ()
@@ -124,124 +121,42 @@ function delete_content_shortcode(id)
 		}
 	}
  $(document).ready(function() {
-  $('.summernote').summernote(
-   {
-      height: 400, //set editable area's height
-      codemirror:
-      { // codemirror options
-         theme: 'monokai'
-      },
-   });
 });
-$(document).ready(function ()
-{
-	    // $("table#gal_list").simpleCheckboxTable({
-     //    onCheckedStateChanged: function ($checkbox) {
-     //        // Do something
-     //    }
-    });
+
 
 	$(document).on('click', '#saveContentSlider', function ()
 	{
-	var title = $("#name").val();
-	var slider_name = $("#slider_name").val();
-	var content = $.trim($('.summernote').summernote('code'));//$.trim($('#content').val());
-	var button_text = $("#button_text").val();
-	var button_url = $("#button_url").val();
+	var quarter_report_name = $("#quarter_report_name").val();
+	var quarter = $("#quarter option:selected").val();
+	var quarter_year = $("#year option:selected").text();
 	var edit_id = $("#edit_id").val();
-	var checked = '0'; 
-	 if($('#last_slide_status').prop('checked')){ 
-	 	checked = '1'; 
-	 }
-	var str = [];
-	var values = $('input:checkbox:checked.assign').map(function () {
-  	str.push(this.value);
-	}).get();
-	var selected=$('input:checkbox:checked.assign').length;
-	var valid = 0;
 	validate = 0;
 	$("div").removeClass("checkRequired");
-
-	if(selected < 3){
-		$('#msg_select').next('.err-msg').remove();
-		$('#msg_select').after("<small class='err-msg'>Please select checkbox atleast  3.</small>");
-		validate = 1;
-	}else{
-		$('#msg_select').next('.err-msg').remove();
-	}
-
-	if (title == "")
+	if (quarter_report_name == "")
 	{
-		$('#name').next('.err-msg').remove();
-		$('#name').after("<small class='err-msg'>This field is required.</small>");
+		$('#quarter_report_name').next('.err-msg').remove();
+		$('#quarter_report_name').after("<small class='err-msg'>This field is required.</small>");
 		validate = 1;
 	}
 	else
 	{
-		$('#name').next('.err-msg').remove();
-	}
-	if (slider_name == "")
-	{
-		$('#slider_name').next('.err-msg').remove();
-		$('#slider_name').after("<small class='err-msg'>This field is required.</small>");
-		validate = 1;
-	}
-	else
-	{
-		$('#slider_name').next('.err-msg').remove();
-	}
-
-	if (button_text == "")
-	{
-		$('#button_text').next('.err-msg').remove();
-		$('#button_text').after("<small class='err-msg'>This field is required.</small>");
-		validate = 1;
-	}
-	else
-	{
-		$('#button_text').next('.err-msg').remove();
-	}
-
-	if (button_url == "")
-	{
-		$('#button_url').next('.err-msg').remove();
-		$('#button_url').after("<small class='err-msg'>This field is required.</small>");
-		validate = 1;
-	}
-	else
-	{
-		$('#button_url').next('.err-msg').remove();
-	}
-	
-	if (content == "")
-	{
-		$('.note-editor').next('.err-msg').remove();
-		$('.note-editor').after("<small class='err-msg'>This field is required.</small>");
-		validate = 1;
-	}
-	else
-	{
-		$('.note-editor').next('.err-msg').remove();
+		$('#quarter_report_name').next('.err-msg').remove();
 	}
 	if (validate == 0)
 	{
 		$.ajax(
 		{
-			url: contentcallajax.ajaxurl,
+			url: royaltycallajax.ajaxurl,
 			method: "POST",
 			cache: false,
 			async: false,
 			data:
 			{
-				action: 'addcontentslider',
-				title: title,
-				slider_name:slider_name,
-				content: content,
-				button_text:button_text,
-				button_url:button_url,
+				action: 'addreportdata',
+				quarter_report_name: quarter_report_name,
+				quarter: quarter,
+				quarter_year: quarter_year,
 				edit_id:edit_id,
-				content_slider_id:str,
-				last_slide_status:checked,
 			},
 			beforeSend: function ()
 			{
@@ -260,7 +175,7 @@ $(document).ready(function ()
 						$("#add-default-msg").html("");
 						$("#add-default-msg").removeClass("alert alert-success");
 					}, 3000);
-					window.location.replace(origin + pathname + '?page=content_slider_list');
+					window.location.replace(origin + pathname + '?page=royalty_calculator_list');
 				}
 				else
 				{
@@ -328,7 +243,7 @@ $(document).on('click', '#savecontentdata', function ()
 	{
 		$.ajax(
 		{
-			url: contentcallajax.ajaxurl,
+			url: royaltycallajax.ajaxurl,
 			method: "POST",
 			cache: false,
 			async: false,
@@ -399,7 +314,7 @@ function delete_multiple_contentdata()
     	if (isDelete == true) {
            // AJAX Request
            $.ajax({
-           	url: contentcallajax.ajaxurl,
+           	url: royaltycallajax.ajaxurl,
            	type: 'POST',
            	data: { action: 'delete_multiple_contentdata',post_id: post_arr},
            	success: function(response){
@@ -417,7 +332,7 @@ function delete_content_data(id)
 		{
 			$.ajax(
 			{
-				url: contentcallajax.ajaxurl,
+				url: royaltycallajax.ajaxurl,
 				method: "POST",
 
 				data:
