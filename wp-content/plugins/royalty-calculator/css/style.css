@@ -1,0 +1,84 @@
+html, body {
+    background: #fff;
+}
+.tabs-container .nav-item{
+    flex: 1;
+    text-align: center;
+    margin-bottom: 0;
+}
+.err-msg{
+   color:red;
+}
+.note-editor {
+    padding: 0;
+    margin-top: 0;
+    max-width: 100%;
+}
+.tabs-container .nav-item .nav-link.active {
+    font-weight: 500;
+}
+.tab-content .form-check-input[type=checkbox] {
+    margin-top: 6px;
+}
+.tab-content input[type=checkbox]:checked::before {
+    height: 0;
+    width: 0;
+}
+.bootstrap-select .dropdown-menu {
+    max-height: 310px !important;
+    min-height: initial !important;
+}
+.dropdown-menu .inner {
+    max-height: 300px !important;
+    min-height: initial !important;
+}
+.bootstrap-select > .dropdown-toggle {
+    height: 40px;
+    line-height: 40px;
+}
+.bootstrap-select .dropdown-toggle .filter-option {
+    position: absolute;
+    padding: 0 30px 0 10px;
+}
+.bootstrap-select > .dropdown-toggle:after {
+    position: absolute;
+    right: 10px;
+}
+.img_wrp {
+       display: inline-block;
+       position: relative;
+       margin: 12px 8px 0 0;
+    }
+.img_wrp > img{
+       width: 80px;
+       height: 80px;
+       object-fit: cover;
+       border: 1px solid #dfdfdf;
+    }
+.close img{
+       position: absolute;
+       top: -8px;
+       right: -8px;
+       width: 20px;
+       height: 20px;
+       border-radius: 50%;
+       box-shadow: 0px 1px 2px 0px rgb(0 0 0 / 30%);
+    }
+
+.task-list .col-6 {
+    border: 1px solid #4977d9;
+    background-color: #E6EEFF;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    padding: 5px 8px 8px 8px;
+    font-size: 14px;
+}
+.task-list .col-6 input {
+    margin-top: 3px !important;
+}
+.task-list .col-6 label {
+    line-height: 1.4;
+}
+#gal_list li {
+    list-style: circle;
+}
