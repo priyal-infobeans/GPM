@@ -18,6 +18,7 @@ function royalty_calculator_table_installer()
   `quarter_report_name` varchar(300) DEFAULT NULL,
   `quarter` varchar(255) DEFAULT NULL,
   `quarter_year` varchar(255) DEFAULT NULL,
+  `status` ENUM('completed','processing','cancelled') NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";

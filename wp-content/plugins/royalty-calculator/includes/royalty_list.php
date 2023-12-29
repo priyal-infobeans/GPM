@@ -16,7 +16,11 @@
             <table class="table table-bordered" id="gal_list">
                <thead class="table-light">
                   <tr>
-                     <th scope="col" width="20%">Quarter Name</th>
+                     <th scope="col" width="5%">ID</th>
+                     <th scope="col" width="20%">Name</th>
+                     <th scope="col" width="20%">Year</th>
+                     <th scope="col" width="20%">Quarter</th>
+                     <th scope="col" width="20%">Status</th>
                      <th scope="col" width="15%">Action</th>
                   </tr>
                </thead>
@@ -25,7 +29,19 @@
                      foreach($shortcode as $arr){ ?>
                   <tr>
                      <td>
+                        <?php echo $arr['id'];?>
+                     </td>
+                     <td>
                         <?php echo $arr['quarter_report_name'];?>
+                     </td>
+                     <td>
+                        <?php echo ucfirst($arr['quarter']);?>
+                     </td>
+                     <td>
+                        <?php echo $arr['quarter_year'];?>
+                     </td>
+                     <td>
+                        <?php echo ucfirst($arr['status']);?>
                      </td>
                      <td>
                         <a href="?page=create_quarter_report&id=<?php echo $arr["id"];?>">Edit</a> |
@@ -35,7 +51,7 @@
                   <?php } 
                }else{ ?>
                   <tr>
-                     <td colspan="2" class="text-center">No Records</td>
+                     <td colspan="5" class="text-center">No Records</td>
                   </tr>
                   <?php } ?>
                </tbody>
