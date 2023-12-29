@@ -116,17 +116,16 @@ function addcontentdata()
 		require_once( ABSPATH . 'wp-admin/includes/file.php' );
 	}
 	$return = "success";
-	$report_table = create_mapping_table(); // to create report mapping table.
 	global $wpdb;
+	$report_table = create_mapping_table(); // to create report mapping table.
 	$report_id = isset($_POST['report_id']) ? $_POST['report_id'] : '';
-	
-	$id=isset($_POST['edit_id']) ? $_POST['edit_id'] : '0';
+	$id = isset($_POST['edit_id']) ? $_POST['edit_id'] : '0';
 
 		$vimeo = $_FILES['vimeo'];
         $sales = $_FILES['sales'];
-		// $price = $_FILES['price'];
-		if ($vimeo['error'] === UPLOAD_ERR_OK && $sales['error'] === UPLOAD_ERR_OK) {
-			$files = array($vimeo, $sales);
+		$price = $_FILES['price'];
+		if ($vimeo['error'] === UPLOAD_ERR_OK && $sales['error'] === UPLOAD_ERR_OK ) {//&& $price['error'] === UPLOAD_ERR_OK
+			$files = array($vimeo, $sales);//, $price
 
             foreach ($files as $file) {
 				// Upload the selected files
@@ -146,12 +145,10 @@ function addcontentdata()
 						foreach ($sheet->getRowIterator(1)->current()->getCellIterator() as $cell) {
 							$columnNames[] = $cell->getValue();
 						}
-		
 						createTable($columnNames, $uploaded_table_name);
 
 						// Get the data starting from the second row
 						$data = [];
-
 						foreach ($sheet->getRowIterator(2) as $row) {
 							$rowData = $row->getCellIterator();
 							$rowDataArray = [];
@@ -162,15 +159,30 @@ function addcontentdata()
 							// Combine column names and row data into an associative array
 							$data[] = array_combine($columnNames, $rowDataArray);
 						}
-			
 						// Insert data into the table
 						foreach ($data as $row) {
 							insertData($row, $uploaded_table_name);
 						}
-						 echo 'Data imported successfully.';
+						echo 'Data imported successfully.';
 				}
-				//END  
+				//END
         	}// foreach
+			$mapping_data = $wpdb->get_row("SELECT * FROM report_mapping WHERE id=".$id,ARRAY_A);
+			if(!empty($mapping_data)){
+				$wpdb->update('report_mapping', array(
+					'report_id' => $report_id,
+					'upload_vimeo'=> $vimeo['name'],
+					'upload_sales' => $sales['name'],
+					'upload_price' => $price['name'],
+				),array('id'=>$id));
+			} else {
+				$wpdb->insert('report_mapping', array(
+					'report_id' => $report_id,
+					'upload_vimeo'=> $vimeo['name'],
+					'upload_sales' => $sales['name'],
+					'upload_price' => $price['name'],
+				));
+			}
         } else {
             echo 'Error uploading files.';
         }
@@ -214,9 +226,7 @@ function createTable($columns, $tableName) {
     foreach ($columns as $column) {
         $sql .= "$column VARCHAR(255), ";
     }
-
     $sql = rtrim($sql, ", ") . ");";
-
     // Execute table creation SQL 
 	maybe_create_table( $wpdb->prefix . $tableName, $sql );
 }
@@ -225,27 +235,6 @@ function insertData($data, $tableName) {
     global $wpdb;
     // Insert data into the table
     $wpdb->insert($tableName, $data);
-}
-function mycoolplugin_create_folder() {
-    global $wp_filesystem;
-
-    /* It is a Wordpress core file, that's why we manually include it */
-    require_once ( ABSPATH . '/wp-admin/includes/file.php' );
-    
-    /* Just instantiate as follows */
-    WP_Filesystem();
-
-    $custom_folder = WP_CONTENT_DIR .'/uploads/my-awesome-folder';
-
-    if ( $wp_filesystem->exists( $custom_folder ) ) {
-        // Do something if the File or Folder exists...
-		return;
-    } else {
-       // File or Folder doesn't exist so we create it, returns true if created, false if something went wrong
-       $folder_created = $wp_filesystem->mkdir( $custom_folder, 0755 );
-
-       if( ! $folder_created ) return new \WP_Error( 'FilesysError', __( 'Failed to create a folder.', 'my_textdomain' ) );
-    }
 }
 
 function create_mapping_table(){
