@@ -173,14 +173,14 @@ function addcontentdata()
 					'report_id' => $report_id,
 					'upload_vimeo'=> $vimeo['name'],
 					'upload_sales' => $sales['name'],
-					'upload_price' => $price['name'],
+					// 'upload_price' => $price['name'],
 				),array('id'=>$id));
 			} else {
 				$wpdb->insert('report_mapping', array(
 					'report_id' => $report_id,
 					'upload_vimeo'=> $vimeo['name'],
 					'upload_sales' => $sales['name'],
-					'upload_price' => $price['name'],
+					// 'upload_price' => $price['name'],
 				));
 			}
         } else {
