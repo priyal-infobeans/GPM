@@ -106,6 +106,7 @@ $(document).on('click', '#savecontentdata', function ()
 				var options = JSON.parse(response);
 					console.log(options);
 				//alert(response); // <-- display response from the PHP script, if any
+				window.location.replace(origin + pathname + '?page=content_list&preview='+options.preview);
 			}
 		});
 	});

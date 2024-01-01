@@ -8,6 +8,9 @@
         <?php } ?>
          </div>
       </div>
+      <?php
+      // $mapping;// data from mapping table
+      ?>
       <form method="post" name="upload_report" enctype="multipart/form-data">
          <input type="hidden" name="edit_id" id="edit_id" value="<?php if(isset($_GET['id'])){ echo $_GET['id']; }else{ echo 0; } ?>">
          <div class="mb-3 row">

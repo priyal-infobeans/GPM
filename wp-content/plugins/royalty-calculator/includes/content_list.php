@@ -18,48 +18,40 @@
                   <tr>
                      <!-- <th scope="col" width="5%"><input type="checkbox"></th> -->
                      <th scope="col" width="5%">ID</th>
+                     <th scope="col" width="10%">Plays</th>
+                     <th scope="col" width="10%">Loads</th>
                      <th scope="col" width="30%">Name</th>
-                     <th scope="col" width="10%">Year</th>
-                     <th scope="col" width="20%">Quarter</th>
-                     <th scope="col" width="10%">Status</th>
+                     <th scope="col" width="10%">Viewers</th>
                      <th scope="col" width="10%">Action</th>
                   </tr>
                </thead>
                <tbody>
-                  <?php if(!empty($shortcode)){ 
+                  <?php if(!empty($export_record)){ 
 
-                     foreach($shortcode as $arr){ ?>
+                     foreach($export_record as $arr){ 
+                        // echo '<pre>';print_r($arr);
+                        ?>
                   <tr>
                      <!-- <td><input type="checkbox" class="get_check" name="get_check[]" id="del_<?= $arr["id"]; ?>" value="<?= $res->id; ?>"></td> -->
                      <td>
-                        <?php
-                           global $wpdb;
-                           $content_slider = $wpdb->get_results("SELECT * FROM content_slider",ARRAY_A);
-                           echo '<ul>';
-                           foreach($content_slider as $val){
-                              $explode = explode(',', $val['content_slider_id']);
-                              if (in_array($arr['id'], $explode)) { 
-                                 echo '<li>'.$val['slider_name'].'</li>';     
-                              }
-                           }
-                           echo '</ul>';
-                        ?>
-                        </ul>
+                        <?php echo $arr['id'];?>
                      </td>
                     
                      <td>
-                        <?php echo $arr['title'];?>
+                        <?php echo $arr['plays'];?>
                      </td>
                      <td>
-                        <?php echo $arr['description'];?>
+                        <?php echo $arr['loads'];?>
                      </td>
                      <td>
-                       <img src="<?php echo $arr['image'];?>" style="width:70px;height:70px;">
+                        <?php echo $arr['name'];?>
                      </td>
-                     
                      <td>
-                        <a href="?page=create_content&id=<?php echo $arr["id"];?>">Edit</a> |
-                           <a href="javascript:void(0)" onclick="delete_content_data('<?php echo $arr["id"];?>');">Delete</a>
+                        <?php echo $arr['unique_viewers'];?>
+                     </td>
+                     <td>
+                           <!-- <a href="?page=create_content&id=<?php echo $arr["id"];?>">Edit</a> |
+                           <a href="javascript:void(0)" onclick="delete_content_data('<?php echo $arr["id"];?>');">Delete</a> -->
                      </td>
                   </tr>
                   <?php } 

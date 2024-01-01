@@ -15,6 +15,8 @@ function content_list()
 {
 	global $wpdb;
 	$shortcode=$wpdb->get_results("SELECT * FROM report_mapping",ARRAY_A);
+	$table_name = $shortcode[0]['report_name'];
+	$export_record = $wpdb->get_results("SELECT * FROM $table_name",ARRAY_A);
 	require_once(plugin_dir_path(__FILE__) . 'includes/content_list.php');	
 }
 
@@ -100,9 +102,11 @@ function upload_report_data()
 	global $wpdb;
 	if(isset($_GET['id'])){
 		$id=$_GET['id'];
+		$mapping = $wpdb->get_results("SELECT * FROM report_mapping",ARRAY_A);
 		require_once(plugin_dir_path(__FILE__) . 'includes/add_content.php');	
 	}else{
 		$shortcode=$wpdb->get_results("SELECT * FROM royalty_report", ARRAY_A);
+		$mapping = $wpdb->get_results("SELECT * FROM report_mapping",ARRAY_A);
 		require_once(plugin_dir_path(__FILE__) . 'includes/add_content.php');
 	}
 }
@@ -119,7 +123,7 @@ function addcontentdata()
 	global $wpdb;
 	$report_table = create_mapping_table(); // to create report mapping table.
 	$report_id = isset($_POST['report_id']) ? $_POST['report_id'] : '';
-	$id = isset($_POST['edit_id']) ? $_POST['edit_id'] : '0';
+	$id = isset($_POST['edit_id']) ? $_POST['edit_id'] : 0;
 
 		$vimeo = $_FILES['vimeo'];
         $sales = $_FILES['sales'];
@@ -174,6 +178,7 @@ function addcontentdata()
 					'upload_vimeo'=> $vimeo['name'],
 					'upload_sales' => $sales['name'],
 					// 'upload_price' => $price['name'],
+					'report_name' => $uploaded_table_name,
 				),array('id'=>$id));
 			} else {
 				$wpdb->insert('report_mapping', array(
@@ -181,12 +186,13 @@ function addcontentdata()
 					'upload_vimeo'=> $vimeo['name'],
 					'upload_sales' => $sales['name'],
 					// 'upload_price' => $price['name'],
+					'report_name' => $uploaded_table_name,
 				));
 			}
         } else {
             echo 'Error uploading files.';
         }
-	echo json_encode(array('status' => $return));
+	echo json_encode(array('status' => $return, 'preview' => $uploaded_table_name));
 	wp_die();
 }
 
@@ -247,6 +253,7 @@ function create_mapping_table(){
 		`upload_vimeo` varchar(255) NOT NULL,
 		`upload_sales` varchar(255) NOT NULL,
 		`upload_price` varchar(255) NOT NULL,
+		`report_name` varchar(255) NOT NULL,
 		PRIMARY KEY (`id`)
 	  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";    
 	maybe_create_table( $wpdb->prefix . $tablename, $main_sql_create );
