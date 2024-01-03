@@ -36,12 +36,13 @@
              <input type="file" name="sales_report" id="sales_report_id">
             </div>
          </div>
-         <!-- <div class="mb-3 row">
+         <div class="mb-3 row">
             <label for="price_report" class="col-2 col-form-label">Upload Price Report</label>
             <div class="col-8">
              <input type="file" name="price_report" id="price_report_id">
             </div>
-         </div> -->
+         </div>
+         <div id="importResult"></div>
       <div class="mb-3 row">
          <div class="col-2"></div>
             <div class="col-10">

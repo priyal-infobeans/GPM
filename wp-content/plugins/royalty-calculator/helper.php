@@ -14,7 +14,9 @@ add_action('wp_ajax_add_royalty_calculator_list', 'royalty_calculator_list');
 function content_list()
 {
 	global $wpdb;
-	$shortcode=$wpdb->get_results("SELECT * FROM report_mapping",ARRAY_A);
+	$report_id = isset($_GET['preview_id'])? $_GET['preview_id'] : '';
+	$shortcode=$wpdb->get_results("SELECT * FROM report_mapping where report_id=$report_id",ARRAY_A);
+	// echo '<pre>';print_r($shortcode);
 	$table_name = $shortcode[0]['report_name'];
 	$export_record = $wpdb->get_results("SELECT * FROM $table_name",ARRAY_A);
 	require_once(plugin_dir_path(__FILE__) . 'includes/content_list.php');	
@@ -114,90 +116,114 @@ function upload_report_data()
 add_action('wp_ajax_nopriv_upload_report_data', 'upload_report_data');
 add_action('wp_ajax_add_upload_report_data', 'upload_report_data');
 
-function addcontentdata()
-{
+// Enqueue necessary scripts and styles
+function enqueue_custom_scripts() {
+    wp_enqueue_script('jquery');
+    wp_enqueue_media();
+}
+add_action('admin_enqueue_scripts', 'enqueue_custom_scripts');
+
+function mappingData($report_id, $file, $uploaded_table_name) {
+	global $wpdb;
+
+	$id = isset($_POST['edit_id']) ? $_POST['edit_id'] : 0;
+	$mapping_data = $wpdb->get_row("SELECT * FROM report_mapping WHERE report_id=".$report_id." and report_name='".$uploaded_table_name."'",ARRAY_A);
+	if(!empty($mapping_data)){
+		$wpdb->update('report_mapping', array(
+			'report_id' => $report_id,
+			'report_name' => $uploaded_table_name,
+		),array('id'=>$id));
+	} else {
+		$wpdb->insert('report_mapping', array(
+			'report_id' => $report_id,
+			'report_name' => $uploaded_table_name,
+		));
+	}
+	return;
+}
+
+function addContentData() {
+	global $wpdb;
+	$report_id = isset($_POST['report_id']) ? $_POST['report_id'] : '';
+	$id = isset($_POST['edit_id']) ? $_POST['edit_id'] : 0;
+	$vimeo = $_FILES['vimeo']['name'];
+	$sales = $_FILES['sales']['name'];
+	$price = $_FILES['price']['name'];
+	$mapping_data = $wpdb->get_row("SELECT * FROM report_mapping WHERE report_id=".$report_id,ARRAY_A);
+	if(!empty($mapping_data)){
+		$wpdb->update('report_mapping', array(
+			'report_id' => $report_id,
+			'upload_vimeo' => $vimeo,
+			'upload_sales' => $sales,
+			'upload_price' => $price
+		),array('report_id'=>$report_id));
+	} else {
+		$wpdb->insert('report_mapping', array(
+			'report_id' => $report_id,
+			'upload_vimeo' => $vimeo,
+			'upload_sales' => $sales,
+			'upload_price' => $price
+		));
+	}
+	echo json_encode(array('status' => 'success', 'preview' => $report_id));
+	wp_die();
+}
+add_action('wp_ajax_nopriv_addContentData', 'addContentData');
+add_action('wp_ajax_addContentData', 'addContentData');
+
+// Handle AJAX request for parsing and importing files
+function handle_ajax_xlsx_submission() {
 	if ( ! function_exists( 'wp_handle_upload' ) ) {
 		require_once( ABSPATH . 'wp-admin/includes/file.php' );
 	}
-	$return = "success";
-	global $wpdb;
-	$report_table = create_mapping_table(); // to create report mapping table.
+    $file = $_FILES['file'];
 	$report_id = isset($_POST['report_id']) ? $_POST['report_id'] : '';
-	$id = isset($_POST['edit_id']) ? $_POST['edit_id'] : 0;
+	// Upload the selected files
+	$movefile = uploadFileData($file);
+	$uploaded_table_name = formatReport($report_id, $file['name']);
+    if ($file['error'] === UPLOAD_ERR_OK) {
+		$filePath = $movefile['file'];
 
-		$vimeo = $_FILES['vimeo'];
-        $sales = $_FILES['sales'];
-		$price = $_FILES['price'];
-		if ($vimeo['error'] === UPLOAD_ERR_OK && $sales['error'] === UPLOAD_ERR_OK ) {//&& $price['error'] === UPLOAD_ERR_OK
-			$files = array($vimeo, $sales);//, $price
+        // Load PhpSpreadsheet library
+		require_once (plugin_dir_path(__FILE__) . 'PhpSpreadsheet/vendor/autoload.php');
 
-            foreach ($files as $file) {
-				// Upload the selected files
-				$movefile = uploadFileData($file);
-				$uploaded_table_name = formatReport($report_id, $file['name']);
-				//START
-				if ( $movefile && ! isset( $movefile['error'] ) ) {
-					$file_path = $movefile['file'];
-						// Load PhpSpreadsheet library
-						require_once (plugin_dir_path(__FILE__) . 'PhpSpreadsheet/vendor/autoload.php');
-		
-						// Create a table with columns from XLSX file first row
-						$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file_path);
-						$sheet = $spreadsheet->getActiveSheet();
-						$columnNames = [];
-		
-						foreach ($sheet->getRowIterator(1)->current()->getCellIterator() as $cell) {
-							$columnNames[] = $cell->getValue();
-						}
-						createTable($columnNames, $uploaded_table_name);
+        // Create a table with columns from XLSX file first row
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($filePath);
+        $sheet = $spreadsheet->getActiveSheet();
 
-						// Get the data starting from the second row
-						$data = [];
-						foreach ($sheet->getRowIterator(2) as $row) {
-							$rowData = $row->getCellIterator();
-							$rowDataArray = [];
-
-							foreach ($rowData as $cell) {
-								$rowDataArray[] = $cell->getValue();
-							}
-							// Combine column names and row data into an associative array
-							$data[] = array_combine($columnNames, $rowDataArray);
-						}
-						// Insert data into the table
-						foreach ($data as $row) {
-							insertData($row, $uploaded_table_name);
-						}
-						echo 'Data imported successfully.';
-				}
-				//END
-        	}// foreach
-			$mapping_data = $wpdb->get_row("SELECT * FROM report_mapping WHERE id=".$id,ARRAY_A);
-			if(!empty($mapping_data)){
-				$wpdb->update('report_mapping', array(
-					'report_id' => $report_id,
-					'upload_vimeo'=> $vimeo['name'],
-					'upload_sales' => $sales['name'],
-					// 'upload_price' => $price['name'],
-					'report_name' => $uploaded_table_name,
-				),array('id'=>$id));
-			} else {
-				$wpdb->insert('report_mapping', array(
-					'report_id' => $report_id,
-					'upload_vimeo'=> $vimeo['name'],
-					'upload_sales' => $sales['name'],
-					// 'upload_price' => $price['name'],
-					'report_name' => $uploaded_table_name,
-				));
-			}
-        } else {
-            echo 'Error uploading files.';
+        $columnNames = [];
+        foreach ($sheet->getRowIterator(1)->current()->getCellIterator() as $cell) {
+            $columnNames[] = $cell->getValue();
         }
-	echo json_encode(array('status' => $return, 'preview' => $uploaded_table_name));
-	wp_die();
+		createTable($columnNames, $uploaded_table_name);
+
+        // Get the data starting from the second row
+        $data = [];
+        foreach ($sheet->getRowIterator(2) as $row) {
+            $rowData = $row->getCellIterator();
+            $rowDataArray = [];
+            foreach ($rowData as $cell) {
+                $rowDataArray[] = $cell->getValue();
+            }
+            // Combine column names and row data into an associative array
+            $data[] = array_combine($columnNames, $rowDataArray);
+        }
+
+        // Insert data into the table
+        foreach ($data as $row) {
+            insertData($row, $uploaded_table_name);
+        }
+		mappingData($report_id, $file, $uploaded_table_name);
+		echo '<input type="hidden" name="report_name[]" id="report_name" value="'.$uploaded_table_name.'">';
+        echo 'Data from ' . $file['name'] . ' imported successfully.<br>';
+    } else {
+        echo 'Error uploading file.';
+    }
+    wp_die();
 }
 
-add_action('wp_ajax_nopriv_addcontentdata', 'addcontentdata');
-add_action('wp_ajax_addcontentdata', 'addcontentdata');
+add_action('wp_ajax_handle_ajax_xlsx_submission', 'handle_ajax_xlsx_submission');
+add_action('wp_ajax_nopriv_handle_ajax_xlsx_submission', 'handle_ajax_xlsx_submission'); // Allow non-logged-in users to access the AJAX endpoint
 
 // Function to upload files in wp uploads folder
 function uploadFileData($file) {
@@ -206,6 +232,7 @@ function uploadFileData($file) {
 	$movefile = wp_handle_upload( $file, $upload_overrides );
 	return $movefile;
 }
+
 // Funtion to rename the report import table
 function formatReport($report_id, $file) {
 	global $wpdb;
@@ -222,8 +249,6 @@ function formatReport($report_id, $file) {
 // Function to create a table with columns from XLSX file first row
 function createTable($columns, $tableName) {
     global $wpdb;
-
-    // $tableName = $wpdb->prefix .'vimeo_content';
 	// Delete table SQL
 	$wpdb->query( "DROP TABLE IF EXISTS $tableName" );
     // Create table SQL
@@ -236,6 +261,7 @@ function createTable($columns, $tableName) {
     // Execute table creation SQL 
 	maybe_create_table( $wpdb->prefix . $tableName, $sql );
 }
+
 // Function to insert data into the created table
 function insertData($data, $tableName) {
     global $wpdb;
@@ -243,6 +269,7 @@ function insertData($data, $tableName) {
     $wpdb->insert($tableName, $data);
 }
 
+// Function to create mapping table
 function create_mapping_table(){
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 	global $wpdb;

@@ -2,7 +2,6 @@ var $ = jQuery;
 var url = window.location.href;
 var pathname = window.location.pathname;
 var origin = window.location.origin;
-
 $(document).on('click', '#checkAll', function (){
 	$('input:checkbox').not(this).prop('checked', this.checked);
 });
@@ -75,24 +74,33 @@ $(document).on('click', '#checkAll', function (){
 		});
 	}
 });
+$(document).on('change', '#vimeo_report_id, #sales_report_id, #price_report_id', function ()
+ {
+	var file = this.files[0];
 
+	if (file) {
+		parseAndImportFile(file);
+	}
+});
 $(document).on('click', '#savecontentdata', function ()
 	{
 		var report_type = $("#report_type").val();
+		var report_name = $("#report_name").val();
 		var edit_id=$("#edit_id").val();
 		var vimeo = $('#vimeo_report_id').prop('files')[0]; 
 		var sales = $('#sales_report_id').prop('files')[0];
-		// var price = $('#price_report_id').prop('files')[0];
+		var price = $('#price_report_id').prop('files')[0];
 		var form_data = new FormData();                  
 		form_data.append('vimeo', vimeo);
 		form_data.append('sales', sales);
-		// form_data.append('price', price);
+		form_data.append('price', price);
 		form_data.append('action', 'addcontentdata');
 		form_data.append('report_id', report_type);
+		form_data.append('report_name', report_name);
 		form_data.append('edit_id', edit_id);
 		$.ajax({
-			url: royaltycallajax.ajaxurl, // <-- point to server-side PHP script 
-			dataType: 'text',  // <-- what to expect back from the PHP script, if anything
+			url: royaltycallajax.ajaxurl,
+			dataType: 'text',
 			cache: false,
 			contentType: false,
 			processData: false,
@@ -104,13 +112,41 @@ $(document).on('click', '#savecontentdata', function ()
 			},
 			success: function(response){
 				var options = JSON.parse(response);
-					console.log(options);
-				//alert(response); // <-- display response from the PHP script, if any
-				window.location.replace(origin + pathname + '?page=content_list&preview='+options.preview);
+					if (options.status == "success")
+					{
+						window.location.replace(origin + pathname + '?page=content_list&preview_id='+options.preview);
+					}
 			}
 		});
 	});
  
+function parseAndImportFile(file){
+	var report_type = $("#report_type").val();
+	var formData = new FormData();
+                formData.append('file', file);
+				formData.append('report_id', report_type);
+				formData.append('action', 'handle_ajax_xlsx_submission');
+                $.ajax({
+                    url: royaltycallajax.ajaxurl,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+					beforeSend: function ()
+					{
+						$("#loader-content").css('display', '');
+						$('#savecontentdata').attr("disabled", true) 
+					},
+                    success: function (response) {
+                        $('#importResult').html(response);
+						$("#loader-content").css('display', 'none');
+						$("#savecontentdata").removeAttr('disabled');
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+}
 function delete_multiple_contentdata()
 {
 	var post_arr = [];
