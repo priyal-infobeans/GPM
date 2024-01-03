@@ -1,5 +1,4 @@
 <?php
-// use  PhpOffice\PhpSpreadsheet\IOFactory;
 
 function royalty_calculator_list()
 {
@@ -9,21 +8,36 @@ function royalty_calculator_list()
 }
 
 add_action('wp_ajax_nopriv_royalty_calculator_list', 'royalty_calculator_list');
-add_action('wp_ajax_add_royalty_calculator_list', 'royalty_calculator_list');
+add_action('wp_ajax_royalty_calculator_list', 'royalty_calculator_list');
 
 function content_list()
 {
 	global $wpdb;
-	$report_id = isset($_GET['preview_id'])? $_GET['preview_id'] : '';
+	$report_id = isset($_GET['preview_id'])?  $_GET['preview_id'] :'';
 	$shortcode=$wpdb->get_results("SELECT * FROM report_mapping where report_id=$report_id",ARRAY_A);
-	// echo '<pre>';print_r($shortcode);
 	$table_name = $shortcode[0]['report_name'];
 	$export_record = $wpdb->get_results("SELECT * FROM $table_name",ARRAY_A);
-	require_once(plugin_dir_path(__FILE__) . 'includes/content_list.php');	
+	require_once(plugin_dir_path(__FILE__) . 'includes/content_list.php');
+		
 }
-
 add_action('wp_ajax_nopriv_content_list', 'content_list');
-add_action('wp_ajax_add_content_list', 'content_list');
+add_action('wp_ajax_content_list', 'content_list');
+
+function preview_list()
+{
+	global $wpdb;
+	$report_id = isset($_POST['report_id'])? $_POST['report_id'] : $_GET['preview_id'];
+	$shortcode=$wpdb->get_results("SELECT * FROM report_mapping where report_id=$report_id",ARRAY_A);
+	$file_type = isset($_POST['file_type'])? $_POST['file_type'] :'';
+	$btn_value = isset($_POST['btn_value'])? $_POST['btn_value'] :'';
+	$table_name = formatReport($report_id, $file_type);
+	$export_record = $wpdb->get_results("SELECT * FROM $table_name",ARRAY_A);
+	require_once(plugin_dir_path(__FILE__) . 'includes/content_list.php');
+	echo json_encode(array('status' => "success",'result'=>$export_record));
+	wp_die();
+}
+add_action('wp_ajax_nopriv_preview_list', 'preview_list');
+add_action('wp_ajax_preview_list', 'preview_list');
 
 function create_quarter_report()
 {
@@ -42,7 +56,7 @@ function create_quarter_report()
 }
 
 add_action('wp_ajax_nopriv_create_quarter_report', 'create_quarter_report');
-add_action('wp_ajax_add_create_quarter_report', 'create_quarter_report');
+add_action('wp_ajax_create_quarter_report', 'create_quarter_report');
 
 function addreportdata()
 {
@@ -114,7 +128,7 @@ function upload_report_data()
 }
 
 add_action('wp_ajax_nopriv_upload_report_data', 'upload_report_data');
-add_action('wp_ajax_add_upload_report_data', 'upload_report_data');
+add_action('wp_ajax_upload_report_data', 'upload_report_data');
 
 // Enqueue necessary scripts and styles
 function enqueue_custom_scripts() {

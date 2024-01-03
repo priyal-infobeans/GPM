@@ -1,16 +1,34 @@
-<div class="container-fluid p-5">
+
+<div id="myDiv" style="display:none;">
+   <img id="loading-image-greeting-neg" src="<?php echo plugins_url() . '/royalty-calculator/images/loading.gif'; ?>" />
+</div>
+<div class="container-fluid p-5 tmp_preview_list">
       <div class="row mb-3">
          <div class="col-6 d-flex">
             <h4 class="d-inline-block me-3 mb-0">Sales Report</h4>
          </div>
-         <div class="col-6 text-end pt-2">
-            <a href="?page=create_content" class="btn btn-sm btn-success">Vimeo Uploaded File</a>
-            <button type="button" id="delete_all_gal" onclick="delete_multiple_contentdata();" class="btn btn-dark btn-sm">Price List</button>
+         <?php
+         $class_default = 'btn-dark';
+         $class_active = 'btn-success';
+         if (isset($btn_value)){
+            ?>
+            <div class="col-6 text-end pt-2">
+            <button type="button" id="vimeo_list" onclick="previewList('<?php echo $shortcode[0]['upload_vimeo'];?>','vimeo');" class="btn btn-sm <?php if($btn_value == 'vimeo') { echo $class_active; } else {echo $class_default;}?>">Vimeo Uploaded File</button>
+            <button type="button" id="price_list" onclick="previewList('<?php echo $shortcode[0]['upload_price'];?>','price');" class="btn btn-sm <?php if($btn_value == 'price') { echo $class_active; } else {echo $class_default;}?>">Price List</button>
+            <button type="button" id="sales_list" onclick="previewList('<?php echo $shortcode[0]['upload_sales'];?>','sales');" class="btn btn-sm <?php if($btn_value == 'sales') { echo $class_active; } else {echo $class_default;}?>">Sales List</button>
+            <input type="hidden" name="report_id" id="report_id" value="<?php echo $report_id;?>">
          </div>
+         <?php } else {
+         ?>
+            <div class="col-6 text-end pt-2">
+               <button type="button" id="vimeo_list" onclick="previewList('<?php echo $shortcode[0]['upload_vimeo'];?>','vimeo');" class="btn btn-sm btn-success">Vimeo Uploaded File</button>
+               <button type="button" id="price_list" onclick="previewList('<?php echo $shortcode[0]['upload_price'];?>','price');" class="btn btn-sm btn-dark">Price List</button>
+               <button type="button" id="sales_list" onclick="previewList('<?php echo $shortcode[0]['upload_sales'];?>','sales');" class="btn btn-sm btn-dark">Sales List</button>
+               <input type="hidden" name="report_id" id="report_id" value="<?php echo $report_id;?>">
+            </div>
+         <?php }?>
       </div>
-      <div class="myDiv" style="display:none;">
-         <img id="loading-image-greeting-neg" src="<?php echo plugins_url() . '/royalty-calculator/images/loading.gif'; ?>" />
-      </div>
+      
       <div id="post_content">
          <div id="page_data">
             <table class="table table-bordered" id="gal_list">
