@@ -118,7 +118,62 @@ $(document).on('click', '#savecontentdata', function ()
 		}
 	});
 });
- 
+$(document).on('click', '.editValues', function ()
+{
+	$(this).parents('tr').find('td.editableColumns').each(function() {
+	  var html = $(this).html();
+	  var input = $('<input class="editableColumnsStyle" type="text" />');
+	  input.val(html);
+	  $(this).html(input);
+	});
+	var row = $(this).closest('tr');
+            var rowId = row.data('id');
+	$(this).parents('tr').find('td:last-child').append('<button class="saveBtn" data-id="' + rowId + '">Save</button>');
+	$(this).closest('tr').find('.editValues').hide();
+});
+// Add click event to the "Save" button (dynamic binding)
+$(document).on('click', '.saveBtn', function () {
+	var report_id = $('#report_id').val();
+	var report_name = $('#report_name').val();
+	// Get the parent row
+	var row = $(this).closest('tr');
+	var rowId = $(this).data('id');
+	var updatedData = {};
+
+	// Iterate through each cell in the row
+	row.find('td').each(function () {
+		var cell = $(this);
+		var fieldName = cell.index(); // Use the column index as the field name
+		var updatedContent = cell.find('input').val();
+		 // Update the updatedData object
+		 updatedData[fieldName] = updatedContent;
+		// Replace the input field with the updated content
+		cell.html(updatedContent);
+	});
+	// Show the "Edit" button
+	row.find('.editValues').show();
+	
+	 // Send AJAX request to update data on the server
+	 $.ajax({
+		url: royaltycallajax.ajaxurl,
+		method: 'POST',
+		data: { 
+			id: rowId,
+			data: updatedData,
+			action: 'update_report_logs',
+			report_id: report_id,
+			report_name: report_name,
+		},
+		success: function (response) {
+			console.log('Data updated successfully:', response);
+			// $(this).closest('tr').find('.saveBtn').hide();
+			row.find('.saveBtn').hide();
+		},
+		error: function (xhr, status, error) {
+			console.error('Error updating data:', xhr.responseText);
+		}
+	});
+});
 function parseAndImportFile(file){
 	var report_type = $("#report_type").val();
 	var formData = new FormData();
@@ -149,6 +204,7 @@ function parseAndImportFile(file){
 function previewList(file_type, btn_val)
 {
 	$("#myDiv").css('display', 'block');
+	$('.tmp_preview_list').css('opacity', '0.5');
 	var report_id = $('#report_id').val();
 	// AJAX Request
 	$.ajax({
@@ -160,12 +216,16 @@ function previewList(file_type, btn_val)
 		file_type: file_type,
 		btn_value: btn_val,
 	},
-	success: function(response){$("#myDiv").css('display', 'none');
+	success: function(response){
+		$("#myDiv").css('display', 'none');
+		$('.tmp_preview_list').css('opacity', '');
 		$('.tmp_preview_list').html(response);
 	}
 	});
 }
-
+function update_report(report_id, mapping_id){
+	window.location.replace(origin + pathname + '?page=content_list&preview_id='+report_id+'&id='+mapping_id);
+}
 function delete_content_data(id)
 {
 	var id = id;

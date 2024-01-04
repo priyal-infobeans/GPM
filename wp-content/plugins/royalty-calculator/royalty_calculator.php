@@ -19,20 +19,23 @@ register_uninstall_hook(__FILE__, 'remove_royalty_table_uninstaller');
 register_deactivation_hook(__FILE__, 'uninstall_royalty_plugin');
 
 /**
- * @method RoyaltyCalculator
+ * @method royalty_calculator
  * @brief this method is used for create menu and submenu in admin panel.
  */
-function RoyaltyCalculator() {
+function royalty_calculator() {
     global $wpdb;
     add_menu_page('GPM', 'GPM', 'manage_options', 'royalty-calculator-call-list', 'royalty-calculator-call-list', 'dashicons-screenoptions', 21);
     add_submenu_page('royalty-calculator-call-list', 'All Royalties', 'All Royalties', 'manage_options', 'royalty_calculator_list', 'royalty_calculator_list');
     add_submenu_page('royalty-calculator-call-list', 'Initial Information', 'Initial Information', 'manage_options', 'create_quarter_report', 'create_quarter_report');
     add_submenu_page('royalty-calculator-call-list', 'Pre Data', 'Pre Data', 'manage_options', 'upload_report_data', 'upload_report_data');
-    add_submenu_page('royalty-calculator-call-list', 'Data Information', 'Data Information', 'manage_options', 'content_list', 'content_list');
+    if (isset($_GET['preview_id'])){
+        add_submenu_page('royalty-calculator-call-list', 'Data Information', 'Data Information', 'manage_options', 'content_list', 'content_list');
+    }
+    add_submenu_page('royalty-calculator-call-list', 'Export & Share', 'Export & Share', 'manage_options', 'file_export', 'file_export');
     add_action('init', 'addcontent');
 }
 
-add_action('admin_menu', 'RoyaltyCalculator');
+add_action('admin_menu', 'royalty_calculator');
 
 /**
  * @method remove_royalty_submenu
@@ -44,8 +47,8 @@ function remove_royalty_submenu() {
 
 add_action('admin_head', 'remove_royalty_submenu');
 
-function royaltyScriptStyle() {
-    if ((isset($_GET['page']) && $_GET['page'] == "royalty_calculator_list") || (isset($_GET['page']) && $_GET['page'] == 'content_list')) {
+function royalty_script_style() {
+    if ((isset($_GET['page']) && $_GET['page'] == "royalty_calculator_list") || (isset($_GET['page']) && $_GET['page'] == 'content_list') || (isset($_GET['page']) && $_GET['page'] == 'file_export')) {
         wp_enqueue_style('bootstrap-min', plugins_url() . '/royalty-calculator/css/bootstrap.min.css');
         wp_enqueue_style('style-css', plugins_url() . '/royalty-calculator/css/style.css');
         wp_enqueue_script('jquery-js', plugins_url() . '/royalty-calculator/js/jquery-3.6.0.min.js');
@@ -67,4 +70,4 @@ function royaltyScriptStyle() {
         wp_localize_script('call-js', 'royaltycallajax', array('ajaxurl' => admin_url('admin-ajax.php')));
     }
 }
-add_action('admin_enqueue_scripts', 'royaltyScriptStyle');
+add_action('admin_enqueue_scripts', 'royalty_script_style');

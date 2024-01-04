@@ -1,4 +1,7 @@
-
+<?php if(isset($_GET['id'])) {
+   // load edit view.
+   require_once( 'content_list_edit.php');
+} else { ?>
 <div id="myDiv" style="display:none;">
    <img id="loading-image-greeting-neg" src="<?php echo plugins_url() . '/royalty-calculator/images/loading.gif'; ?>" />
 </div>
@@ -13,11 +16,11 @@
          if (isset($btn_value)){
             ?>
             <div class="col-6 text-end pt-2">
-            <button type="button" id="vimeo_list" onclick="previewList('<?php echo $shortcode[0]['upload_vimeo'];?>','vimeo');" class="btn btn-sm <?php if($btn_value == 'vimeo') { echo $class_active; } else {echo $class_default;}?>">Vimeo Uploaded File</button>
-            <button type="button" id="price_list" onclick="previewList('<?php echo $shortcode[0]['upload_price'];?>','price');" class="btn btn-sm <?php if($btn_value == 'price') { echo $class_active; } else {echo $class_default;}?>">Price List</button>
-            <button type="button" id="sales_list" onclick="previewList('<?php echo $shortcode[0]['upload_sales'];?>','sales');" class="btn btn-sm <?php if($btn_value == 'sales') { echo $class_active; } else {echo $class_default;}?>">Sales List</button>
-            <input type="hidden" name="report_id" id="report_id" value="<?php echo $report_id;?>">
-         </div>
+               <button type="button" id="vimeo_list" onclick="previewList('<?php echo $shortcode[0]['upload_vimeo'];?>','vimeo');" class="btn btn-sm <?php if($btn_value == 'vimeo') { echo $class_active; } else {echo $class_default;}?>">Vimeo Uploaded File</button>
+               <button type="button" id="price_list" onclick="previewList('<?php echo $shortcode[0]['upload_price'];?>','price');" class="btn btn-sm <?php if($btn_value == 'price') { echo $class_active; } else {echo $class_default;}?>">Price List</button>
+               <button type="button" id="sales_list" onclick="previewList('<?php echo $shortcode[0]['upload_sales'];?>','sales');" class="btn btn-sm <?php if($btn_value == 'sales') { echo $class_active; } else {echo $class_default;}?>">Sales List</button>
+               <input type="hidden" name="report_id" id="report_id" value="<?php echo $report_id;?>">
+            </div>
          <?php } else {
          ?>
             <div class="col-6 text-end pt-2">
@@ -39,10 +42,10 @@
                      <th scope="col" width="10%">Loads</th>
                      <th scope="col" width="30%">Name</th>
                      <th scope="col" width="10%">Viewers</th>
-                     <th scope="col" width="10%">Action</th>
+                     <!-- <th scope="col" width="10%">Action</th> -->
                   </tr>
                </thead>
-               <tbody>
+               <tbody class="list-body">
                   <?php if(!empty($export_record)){ 
                      foreach($export_record as $arr){
                         ?>
@@ -62,10 +65,10 @@
                      <td>
                         <?php echo $arr['unique_viewers'];?>
                      </td>
-                     <td>
-                           <!-- <a href="?page=create_content&id=<?php echo $arr["id"];?>">Edit</a> |
-                           <a href="javascript:void(0)" onclick="delete_content_data('<?php echo $arr["id"];?>');">Delete</a> -->
-                     </td>
+                     <!-- <td>
+                           <a href="?page=create_content&id=<?php echo $arr["id"];?>">Edit</a> |
+                           <a href="javascript:void(0)" onclick="delete_content_data('<?php echo $arr["id"];?>');">Delete</a>
+                     </td> -->
                   </tr>
                   <?php } 
                }else{ ?>
@@ -77,4 +80,9 @@
             </table>
          </div>
       </div>
+      <div class="col-6 text-end pt-2">
+         <button type="button" id="edit_list" class="btn btn-sm btn-dark" onclick="update_report(<?php echo $report_id?>, <?php echo $shortcode[0]['id']?>)">Edit</button>
+         <button type="button" id="save_next" class="btn btn-sm btn-primary" onclick="window.location.href='<?php echo admin_url();?>admin.php?page=file_export'">Save & Next</button>
+      </div>
    </div>
+   <?php }?>

@@ -10,6 +10,13 @@ function royalty_calculator_list()
 add_action('wp_ajax_nopriv_royalty_calculator_list', 'royalty_calculator_list');
 add_action('wp_ajax_royalty_calculator_list', 'royalty_calculator_list');
 
+function file_export()
+{
+	global $wpdb;
+	require_once(plugin_dir_path(__FILE__) . 'includes/file_export.php');
+}
+add_action('wp_ajax_file_export', 'file_export');
+
 function content_list()
 {
 	global $wpdb;
@@ -33,7 +40,7 @@ function preview_list()
 	$table_name = formatReport($report_id, $file_type);
 	$export_record = $wpdb->get_results("SELECT * FROM $table_name",ARRAY_A);
 	require_once(plugin_dir_path(__FILE__) . 'includes/content_list.php');
-	echo json_encode(array('status' => "success",'result'=>$export_record));
+	json_encode(array('status' => "success",'result'=>$export_record));
 	wp_die();
 }
 add_action('wp_ajax_nopriv_preview_list', 'preview_list');
@@ -52,7 +59,6 @@ function create_quarter_report()
 	}else{
 		require_once(plugin_dir_path(__FILE__) . 'includes/create_quarter_report.php');
 	}
-	
 }
 
 add_action('wp_ajax_nopriv_create_quarter_report', 'create_quarter_report');
@@ -300,4 +306,48 @@ function create_mapping_table(){
 	maybe_create_table( $wpdb->prefix . $tablename, $main_sql_create );
 }
 
+function update_report_logs()
+{
+	global $wpdb;
+	$report_id = isset($_POST['report_id']) ? $_POST['report_id']:'';
+	$report_name = isset($_POST['report_name']) ? $_POST['report_name']:'';
+	$plays = isset($_POST['data'][1]) ? $_POST['data'][1] : '';
+	$loads = isset($_POST['data'][2]) ? $_POST['data'][2] : '';
+	$name = isset($_POST['data'][3]) ? $_POST['data'][3] : '';
+	$viewers = isset($_POST['data'][4]) ? $_POST['data'][4] : '';
+
+	// Create an array with the strings
+	$dataArray = array(
+		'plays' => trim($plays),
+		'loads' => trim($loads),
+		'name' => trim($name),
+		'viewers' => trim($viewers)
+	);
+	$columnNames = ['report_id', 'report_name', 'change_log'];
+	$table_name = $report_name.'_logs';
+	$sql = "CREATE TABLE IF NOT EXISTS $table_name (id INT AUTO_INCREMENT PRIMARY KEY, ";
+
+	foreach ($columnNames as $columnName) {
+		// Use VARCHAR for all columns except 'change_log', which is JSON
+		$dataType = ($columnName === 'change_log') ? 'JSON' : 'VARCHAR(255)';
+		// echo "$columnName $dataType,\n";
+		$sql .= "$columnName $dataType, ";
+	}
+	$sql = rtrim($sql, ", ") . "
+	,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);";
+    // Execute table creation SQL 
+	maybe_create_table( $table_name, $sql );
+	$wpdb->insert(
+		$table_name,
+		array(
+			'report_id' => $report_id,
+			'report_name' => $report_name,
+			'change_log' => json_encode($dataArray)
+		)
+	);
+	wp_die();
+}
+add_action('wp_ajax_nopriv_update_report_logs', 'update_report_logs');
+add_action('wp_ajax_update_report_logs', 'update_report_logs');
 ?>
