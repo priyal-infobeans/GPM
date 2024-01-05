@@ -10,13 +10,6 @@ function royalty_calculator_list()
 add_action('wp_ajax_nopriv_royalty_calculator_list', 'royalty_calculator_list');
 add_action('wp_ajax_royalty_calculator_list', 'royalty_calculator_list');
 
-function file_export()
-{
-	global $wpdb;
-	require_once(plugin_dir_path(__FILE__) . 'includes/file_export.php');
-}
-add_action('wp_ajax_file_export', 'file_export');
-
 function content_list()
 {
 	global $wpdb;
@@ -64,7 +57,7 @@ function create_quarter_report()
 add_action('wp_ajax_nopriv_create_quarter_report', 'create_quarter_report');
 add_action('wp_ajax_create_quarter_report', 'create_quarter_report');
 
-function addreportdata()
+function add_report_data()
 {
 	global $wpdb;
 	$return = "success";
@@ -104,8 +97,8 @@ function addreportdata()
 	wp_die();
 }
 
-add_action('wp_ajax_nopriv_addreportdata', 'addreportdata');
-add_action('wp_ajax_addreportdata', 'addreportdata');
+add_action('wp_ajax_nopriv_add_report_data', 'add_report_data');
+add_action('wp_ajax_add_report_data', 'add_report_data');
 
 function delete_selected_report()
 {
@@ -162,7 +155,7 @@ function mappingData($report_id, $file, $uploaded_table_name) {
 	return;
 }
 
-function addContentData() {
+function add_content_data() {
 	global $wpdb;
 	$report_id = isset($_POST['report_id']) ? $_POST['report_id'] : '';
 	$id = isset($_POST['edit_id']) ? $_POST['edit_id'] : 0;
@@ -188,8 +181,8 @@ function addContentData() {
 	echo json_encode(array('status' => 'success', 'preview' => $report_id));
 	wp_die();
 }
-add_action('wp_ajax_nopriv_addContentData', 'addContentData');
-add_action('wp_ajax_addContentData', 'addContentData');
+add_action('wp_ajax_nopriv_add_content_data', 'add_content_data');
+add_action('wp_ajax_add_content_data', 'add_content_data');
 
 // Handle AJAX request for parsing and importing files
 function handle_ajax_xlsx_submission() {
@@ -350,4 +343,71 @@ function update_report_logs()
 }
 add_action('wp_ajax_nopriv_update_report_logs', 'update_report_logs');
 add_action('wp_ajax_update_report_logs', 'update_report_logs');
+
+function file_export() {
+	global $wpdb;
+	require_once(plugin_dir_path(__FILE__) . 'includes/file_export.php');
+}
+
+add_action('wp_ajax_file_export', 'file_export');
+
+function export_share_report() {
+	global $wpdb;
+	// Load PhpSpreadsheet library
+	require_once (plugin_dir_path(__FILE__) . 'PhpSpreadsheet/vendor/autoload.php');
+	$report_name = isset($_POST['report_name'])? $_POST['report_name'] : '';
+	$report_id = isset($_POST['report_id']) ? $_POST['report_id'] : '';
+	$data = $wpdb->get_results("SELECT * FROM $report_name",ARRAY_A);
+
+	// Create a new PhpSpreadsheet instance
+    $spreadsheet = new PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    // Add headers
+    $headers = array_keys($data[0]);
+    $columnIndex = 1;
+    foreach ($headers as $header) {
+        $sheet->setCellValueByColumnAndRow($columnIndex, 1, $header);
+        $columnIndex++;
+    }
+    // Add data
+    $rowIndex = 2;
+    foreach ($data as $row) {
+        $columnIndex = 1;
+        foreach ($row as $value) {
+            $sheet->setCellValueByColumnAndRow($columnIndex, $rowIndex, $value);
+            $columnIndex++;
+        }
+        $rowIndex++;
+    }
+    // Save Excel file
+    $filename = 'excel_export_' . date('YmdHis') . '.xlsx';
+	$filepath = plugin_dir_path(__FILE__) . '/reports/'.$filename;
+
+    $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    $writer->save($filepath);
+
+	// Output file content for download
+    // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+// 	header("Content-type: application/vnd-ms-excel");
+//     header('Content-Disposition: attachment;filename="' . $filename . '"');
+//     // header('Cache-Control: max-age=0');
+// 	header("Pragma: no-cache");
+// header("Expires: 0");
+
+
+// header("Content-type: application/vnd.ms-excel");
+// header("Content-Disposition: attachment; filename=\"$filename\"");  
+// echo plugins_url('/reports/'.$filename, __FILE__);
+// print $csv_output;
+
+    // readfile($filepath);
+
+    // Delete the file after download
+    // unlink($filepath);
+    // Provide download link
+    echo '<p>Excel file generated successfully to reports folder. Click to download <a href="' . plugins_url('/reports/'.$filename, __FILE__) . '" download>Download Excel</a></p>';
+	wp_die();
+}
+add_action('wp_ajax_nopriv_export_share_report', 'export_share_report');
+add_action('wp_ajax_export_share_report', 'export_share_report');
 ?>

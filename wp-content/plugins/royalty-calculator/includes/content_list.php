@@ -81,8 +81,10 @@
          </div>
       </div>
       <div class="col-6 text-end pt-2">
-         <button type="button" id="edit_list" class="btn btn-sm btn-dark" onclick="update_report(<?php echo $report_id?>, <?php echo $shortcode[0]['id']?>)">Edit</button>
-         <button type="button" id="save_next" class="btn btn-sm btn-primary" onclick="window.location.href='<?php echo admin_url();?>admin.php?page=file_export'">Save & Next</button>
+         <button type="button" id="edit_list" class="btn btn-sm btn-dark" onclick="update_report(<?php echo $report_id;?>, <?php echo $shortcode[0]['id'];?>)">Edit</button>
+         <button type="button" id="save_next" class="btn btn-sm btn-primary" onclick="window.location.href='<?php echo admin_url();?>admin.php?page=file_export&file=<?php echo $table_name?>&report_id=<?php echo $report_id?>'">Save & Next</button>
       </div>
    </div>
    <?php }?>
+   
+   <!-- export_report('<?php echo $table_name;?>',<?php echo $report_id;?>); -->

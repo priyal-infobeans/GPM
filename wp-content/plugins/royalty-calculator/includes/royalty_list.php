@@ -3,10 +3,9 @@
          <div class="col-6 d-flex">
             <h4 class="d-inline-block me-3 mb-0">Royalty Calculations</h4>
          </div>
-         <!-- <div class="col-6 text-end pt-2">
-            <a href="?page=create_content_slider" class="btn btn-sm btn-primary">Create Slider</a>
-                <button type="button" id="delete_all_gal" onclick="delete_multiple_content();" class="btn btn-danger btn-sm">Delete Selected</button>
-            </div> -->
+         <div class="col-6 text-end pt-2">
+            <a href="?page=upload_report_data" class="btn btn-sm btn-primary">+Pre Data Collections</a>
+            </div>
       </div>
       <div class="myDiv" style="display:none;">
          <img id="loading-image-greeting-neg" src="<?php echo plugins_url() . '/royalty-calculator/images/loading.gif'; ?>" />

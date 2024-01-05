@@ -28,10 +28,12 @@ function royalty_calculator() {
     add_submenu_page('royalty-calculator-call-list', 'All Royalties', 'All Royalties', 'manage_options', 'royalty_calculator_list', 'royalty_calculator_list');
     add_submenu_page('royalty-calculator-call-list', 'Initial Information', 'Initial Information', 'manage_options', 'create_quarter_report', 'create_quarter_report');
     add_submenu_page('royalty-calculator-call-list', 'Pre Data', 'Pre Data', 'manage_options', 'upload_report_data', 'upload_report_data');
-    if (isset($_GET['preview_id'])){
+    if (isset($_GET['preview_id'])) {
         add_submenu_page('royalty-calculator-call-list', 'Data Information', 'Data Information', 'manage_options', 'content_list', 'content_list');
     }
-    add_submenu_page('royalty-calculator-call-list', 'Export & Share', 'Export & Share', 'manage_options', 'file_export', 'file_export');
+    if (isset($_GET['report_id'])) {
+        add_submenu_page('royalty-calculator-call-list', 'Export & Share', 'Export & Share', 'manage_options', 'file_export', 'file_export');
+    }
     add_action('init', 'addcontent');
 }
 

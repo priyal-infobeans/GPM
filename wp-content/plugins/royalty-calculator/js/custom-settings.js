@@ -34,7 +34,7 @@ $(document).on('click', '#saveContentMain', function ()
 			async: false,
 			data:
 			{
-				action: 'addreportdata',
+				action: 'add_report_data',
 				quarter_report_name: quarter_report_name,
 				quarter: quarter,
 				quarter_year: quarter_year,
@@ -85,7 +85,7 @@ $(document).on('click', '#savecontentdata', function ()
 {
 	var report_type = $("#report_type").val();
 	var report_name = $("#report_name").val();
-	var edit_id=$("#edit_id").val();
+	var edit_id = $("#edit_id").val();
 	var vimeo = $('#vimeo_report_id').prop('files')[0]; 
 	var sales = $('#sales_report_id').prop('files')[0];
 	var price = $('#price_report_id').prop('files')[0];
@@ -93,7 +93,7 @@ $(document).on('click', '#savecontentdata', function ()
 	form_data.append('vimeo', vimeo);
 	form_data.append('sales', sales);
 	form_data.append('price', price);
-	form_data.append('action', 'addcontentdata');
+	form_data.append('action', 'add_content_data');
 	form_data.append('report_id', report_type);
 	form_data.append('report_name', report_name);
 	form_data.append('edit_id', edit_id);
@@ -127,7 +127,7 @@ $(document).on('click', '.editValues', function ()
 	  $(this).html(input);
 	});
 	var row = $(this).closest('tr');
-            var rowId = row.data('id');
+    var rowId = row.data('id');
 	$(this).parents('tr').find('td:last-child').append('<button class="saveBtn" data-id="' + rowId + '">Save</button>');
 	$(this).closest('tr').find('.editValues').hide();
 });
@@ -223,8 +223,60 @@ function previewList(file_type, btn_val)
 	}
 	});
 }
+
 function update_report(report_id, mapping_id){
 	window.location.replace(origin + pathname + '?page=content_list&preview_id='+report_id+'&id='+mapping_id);
+}
+
+function export_report(name, id){
+	//window.location.replace(origin + pathname + '?page=file_export&report_id='+id);
+	$.ajax({
+		url: royaltycallajax.ajaxurl,
+		method: 'post',
+		data: { 
+			action: 'export_share_report',
+			report_name: name,
+			report_id: id,
+		},                     
+		beforeSend: function ()
+		{
+			$("#loader-content").css('display', '');
+		},
+		success: function(response){
+			// console.log(response);
+			//window.location.replace(origin + pathname + '?page=file_export&report_id='+id);
+			// var options = JSON.parse(response);
+				// if (options.status == "success")
+				// {
+				// 	window.location.replace(origin + pathname + '?page=content_list&preview_id='+options.preview);
+				// }
+		}
+	});
+}
+function report_download(name, id){
+	$.ajax({
+		url: royaltycallajax.ajaxurl,
+		method: 'post',
+		data: { 
+			action: 'export_share_report',
+			report_name: name,
+			report_id: id,
+		},                     
+		beforeSend: function ()
+		{
+			$("#loader-content").css('display', '');
+		},
+		success: function(response){
+			$('#exportResult').html(response);
+			// console.log(response);
+			//window.location.replace(origin + pathname + '?page=file_export&report_id='+id);
+			// var options = JSON.parse(response);
+				// if (options.status == "success")
+				// {
+				// 	window.location.replace(origin + pathname + '?page=content_list&preview_id='+options.preview);
+				// }
+		}
+	});
 }
 function delete_content_data(id)
 {
