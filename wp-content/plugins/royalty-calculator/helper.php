@@ -7,7 +7,7 @@ function royalty_calculator_list()
 	require_once(plugin_dir_path(__FILE__) . 'includes/royalty_list.php');	
 }
 
-add_action('wp_ajax_nopriv_royalty_calculator_list', 'royalty_calculator_list');
+// add_action('wp_ajax_nopriv_royalty_calculator_list', 'royalty_calculator_list');
 add_action('wp_ajax_royalty_calculator_list', 'royalty_calculator_list');
 
 function content_list()
@@ -20,7 +20,7 @@ function content_list()
 	require_once(plugin_dir_path(__FILE__) . 'includes/content_list.php');
 		
 }
-add_action('wp_ajax_nopriv_content_list', 'content_list');
+// add_action('wp_ajax_nopriv_content_list', 'content_list');
 add_action('wp_ajax_content_list', 'content_list');
 
 function preview_list()
@@ -30,7 +30,7 @@ function preview_list()
 	$shortcode=$wpdb->get_results("SELECT * FROM report_mapping where report_id=$report_id",ARRAY_A);
 	$file_type = isset($_POST['file_type'])? $_POST['file_type'] :'';
 	$btn_value = isset($_POST['btn_value'])? $_POST['btn_value'] :'';
-	$table_name = formatReport($report_id, $file_type);
+	$table_name = format_report($report_id, $file_type);
 	$export_record = $wpdb->get_results("SELECT * FROM $table_name",ARRAY_A);
 	require_once(plugin_dir_path(__FILE__) . 'includes/content_list.php');
 	json_encode(array('status' => "success",'result'=>$export_record));
@@ -54,7 +54,7 @@ function create_quarter_report()
 	}
 }
 
-add_action('wp_ajax_nopriv_create_quarter_report', 'create_quarter_report');
+// add_action('wp_ajax_nopriv_create_quarter_report', 'create_quarter_report');
 add_action('wp_ajax_create_quarter_report', 'create_quarter_report');
 
 function add_report_data()
@@ -126,7 +126,7 @@ function upload_report_data()
 	}
 }
 
-add_action('wp_ajax_nopriv_upload_report_data', 'upload_report_data');
+// add_action('wp_ajax_nopriv_upload_report_data', 'upload_report_data');
 add_action('wp_ajax_upload_report_data', 'upload_report_data');
 
 // Enqueue necessary scripts and styles
@@ -136,7 +136,7 @@ function enqueue_custom_scripts() {
 }
 add_action('admin_enqueue_scripts', 'enqueue_custom_scripts');
 
-function mappingData($report_id, $file, $uploaded_table_name) {
+function mapping_data($report_id, $file, $uploaded_table_name) {
 	global $wpdb;
 
 	$id = isset($_POST['edit_id']) ? $_POST['edit_id'] : 0;
@@ -192,8 +192,8 @@ function handle_ajax_xlsx_submission() {
     $file = $_FILES['file'];
 	$report_id = isset($_POST['report_id']) ? $_POST['report_id'] : '';
 	// Upload the selected files
-	$movefile = uploadFileData($file);
-	$uploaded_table_name = formatReport($report_id, $file['name']);
+	$movefile = upload_file_data($file);
+	$uploaded_table_name = format_report($report_id, $file['name']);
     if ($file['error'] === UPLOAD_ERR_OK) {
 		$filePath = $movefile['file'];
 
@@ -208,7 +208,7 @@ function handle_ajax_xlsx_submission() {
         foreach ($sheet->getRowIterator(1)->current()->getCellIterator() as $cell) {
             $columnNames[] = $cell->getValue();
         }
-		createTable($columnNames, $uploaded_table_name);
+		create_table($columnNames, $uploaded_table_name);
 
         // Get the data starting from the second row
         $data = [];
@@ -224,9 +224,9 @@ function handle_ajax_xlsx_submission() {
 
         // Insert data into the table
         foreach ($data as $row) {
-            insertData($row, $uploaded_table_name);
+            insert_data($row, $uploaded_table_name);
         }
-		mappingData($report_id, $file, $uploaded_table_name);
+		mapping_data($report_id, $file, $uploaded_table_name);
 		echo '<input type="hidden" name="report_name[]" id="report_name" value="'.$uploaded_table_name.'">';
         echo 'Data from ' . $file['name'] . ' imported successfully.<br>';
     } else {
@@ -239,7 +239,7 @@ add_action('wp_ajax_handle_ajax_xlsx_submission', 'handle_ajax_xlsx_submission')
 add_action('wp_ajax_nopriv_handle_ajax_xlsx_submission', 'handle_ajax_xlsx_submission'); // Allow non-logged-in users to access the AJAX endpoint
 
 // Function to upload files in wp uploads folder
-function uploadFileData($file) {
+function upload_file_data($file) {
 	$upload_dir = wp_upload_dir();
 	$upload_overrides = array( 'test_form' => false );
 	$movefile = wp_handle_upload( $file, $upload_overrides );
@@ -247,7 +247,7 @@ function uploadFileData($file) {
 }
 
 // Funtion to rename the report import table
-function formatReport($report_id, $file) {
+function format_report($report_id, $file) {
 	global $wpdb;
 	$data = $wpdb->get_row("SELECT * FROM royalty_report WHERE id=".$report_id,ARRAY_A);
 	$report_name = strtolower(str_replace(' ', '_', $data['quarter_report_name']));
@@ -260,7 +260,7 @@ function formatReport($report_id, $file) {
 }
 
 // Function to create a table with columns from XLSX file first row
-function createTable($columns, $tableName) {
+function create_table($columns, $tableName) {
     global $wpdb;
 	// Delete table SQL
 	$wpdb->query( "DROP TABLE IF EXISTS $tableName" );
@@ -276,7 +276,7 @@ function createTable($columns, $tableName) {
 }
 
 // Function to insert data into the created table
-function insertData($data, $tableName) {
+function insert_data($data, $tableName) {
     global $wpdb;
     // Insert data into the table
     $wpdb->insert($tableName, $data);
@@ -358,6 +358,10 @@ function export_share_report() {
 	$report_name = isset($_POST['report_name'])? $_POST['report_name'] : '';
 	$report_id = isset($_POST['report_id']) ? $_POST['report_id'] : '';
 	$data = $wpdb->get_results("SELECT * FROM $report_name",ARRAY_A);
+	// update query for report status
+	$wpdb->update('royalty_report', array(
+		'status' => 'completed',
+	),array('id'=>$report_id));
 
 	// Create a new PhpSpreadsheet instance
     $spreadsheet = new PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -379,6 +383,8 @@ function export_share_report() {
         }
         $rowIndex++;
     }
+
+	create_reports_directory();
     // Save Excel file
     $filename = 'excel_export_' . date('YmdHis') . '.xlsx';
 	$filepath = plugin_dir_path(__FILE__) . '/reports/'.$filename;
@@ -388,17 +394,16 @@ function export_share_report() {
 
 	// Output file content for download
     // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-// 	header("Content-type: application/vnd-ms-excel");
-//     header('Content-Disposition: attachment;filename="' . $filename . '"');
-//     // header('Cache-Control: max-age=0');
-// 	header("Pragma: no-cache");
-// header("Expires: 0");
+	// 	header("Content-type: application/vnd-ms-excel");
+	//     header('Content-Disposition: attachment;filename="' . $filename . '"');
+	//     // header('Cache-Control: max-age=0');
+	// 	header("Pragma: no-cache");
+	// header("Expires: 0");
 
-
-// header("Content-type: application/vnd.ms-excel");
-// header("Content-Disposition: attachment; filename=\"$filename\"");  
-// echo plugins_url('/reports/'.$filename, __FILE__);
-// print $csv_output;
+	// header("Content-type: application/vnd.ms-excel");
+	// header("Content-Disposition: attachment; filename=\"$filename\"");  
+	// echo plugins_url('/reports/'.$filename, __FILE__);
+	// print $csv_output;
 
     // readfile($filepath);
 
@@ -410,4 +415,25 @@ function export_share_report() {
 }
 add_action('wp_ajax_nopriv_export_share_report', 'export_share_report');
 add_action('wp_ajax_export_share_report', 'export_share_report');
+
+// Create 'reports' directory and set permissions
+function create_reports_directory() {
+    $directory_path = plugin_dir_path(__FILE__) . 'reports';
+
+    // Check if the directory already exists
+    if (!file_exists($directory_path)) {
+        // Create the 'reports' directory with read and write permissions for everyone
+        mkdir($directory_path, 0777, true);
+    }
+}
+function view_change_logs() {
+	global $wpdb;
+	$report_id = isset($_GET['preview_id'])?  $_GET['preview_id'] :'';
+	$shortcode=$wpdb->get_results("SELECT * FROM report_mapping where report_id=$report_id",ARRAY_A);
+	$table_name = $shortcode[0]['report_name'].'_logs';
+	$view_logs = $wpdb->get_results("SELECT * FROM $table_name",ARRAY_A);
+	require_once(plugin_dir_path(__FILE__) . 'includes/view_logs.php');
+		
+}
+add_action('wp_ajax_view_change_logs', 'view_change_logs');
 ?>

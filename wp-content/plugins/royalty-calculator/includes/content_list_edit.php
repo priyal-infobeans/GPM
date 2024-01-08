@@ -6,6 +6,9 @@
          <div class="col-6 d-flex">
             <h4 class="d-inline-block me-3 mb-0">Edit Sales Report</h4>
          </div>
+         <div class="col-6 text-end pt-2">
+            <a href="?page=content_list&preview_id=<?php echo $_GET['preview_id'];?>" class="btn btn-sm btn-primary">Main Listing</a>
+         </div>
       </div>
       <div id="post_content">
          <div id="page_data">
@@ -57,7 +60,7 @@
       </div>
    </div>
    <div class="col-6 pt-2">
-         <button type="button" id="save_next" class="btn btn-sm btn-dark" onclick="window.location.href='<?php echo admin_url();?>admin.php?page=file_export'">View Change Logs</button>
+         <button type="button" id="save_next" class="btn btn-sm btn-dark" onclick="window.location.href='<?php echo admin_url();?>admin.php?page=logs_request&preview_id=<?php echo $_GET['preview_id']?>'">View Change Logs</button>
          <!-- <button type="button" id="edit_list" class="btn btn-sm btn-dark" onclick="update_report(<?php echo $report_id?>, <?php echo $shortcode[0]['id']?>)">Edit</button> -->
    </div>
    <input type='hidden' name="report_id" id="report_id" value="<?php echo $_GET['preview_id']?>">

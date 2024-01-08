@@ -86,5 +86,3 @@
       </div>
    </div>
    <?php }?>
-   
-   <!-- export_report('<?php echo $table_name;?>',<?php echo $report_id;?>); -->

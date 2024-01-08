@@ -189,11 +189,13 @@ function parseAndImportFile(file){
 		beforeSend: function ()
 		{
 			$("#loader-content").css('display', '');
+			$(".upload-report").css('opacity', '0.5');
 			$('#savecontentdata').attr("disabled", true) 
 		},
 		success: function (response) {
 			$('#importResult').html(response);
 			$("#loader-content").css('display', 'none');
+			$(".upload-report").css('opacity', '');
 			$("#savecontentdata").removeAttr('disabled');
 		},
 		error: function (xhr, status, error) {
@@ -227,32 +229,6 @@ function previewList(file_type, btn_val)
 function update_report(report_id, mapping_id){
 	window.location.replace(origin + pathname + '?page=content_list&preview_id='+report_id+'&id='+mapping_id);
 }
-
-function export_report(name, id){
-	//window.location.replace(origin + pathname + '?page=file_export&report_id='+id);
-	$.ajax({
-		url: royaltycallajax.ajaxurl,
-		method: 'post',
-		data: { 
-			action: 'export_share_report',
-			report_name: name,
-			report_id: id,
-		},                     
-		beforeSend: function ()
-		{
-			$("#loader-content").css('display', '');
-		},
-		success: function(response){
-			// console.log(response);
-			//window.location.replace(origin + pathname + '?page=file_export&report_id='+id);
-			// var options = JSON.parse(response);
-				// if (options.status == "success")
-				// {
-				// 	window.location.replace(origin + pathname + '?page=content_list&preview_id='+options.preview);
-				// }
-		}
-	});
-}
 function report_download(name, id){
 	$.ajax({
 		url: royaltycallajax.ajaxurl,
@@ -268,13 +244,6 @@ function report_download(name, id){
 		},
 		success: function(response){
 			$('#exportResult').html(response);
-			// console.log(response);
-			//window.location.replace(origin + pathname + '?page=file_export&report_id='+id);
-			// var options = JSON.parse(response);
-				// if (options.status == "success")
-				// {
-				// 	window.location.replace(origin + pathname + '?page=content_list&preview_id='+options.preview);
-				// }
 		}
 	});
 }

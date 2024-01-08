@@ -87,28 +87,42 @@ html, body {
     box-sizing: border-box;
   }
   
-  /* Create three equal columns that floats next to each other */
-  .column {
+/* Create three equal columns that floats next to each other */
+.column {
     float: left;
     width: 33.33%;
     padding: 10px;
     height: 300px;
-  }
-  
-  /* Clear floats after the columns */
-  .row:after {
+}
+
+/* Clear floats after the columns */
+.row:after {
     content: "";
     display: table;
     clear: both;
-  }
-  /* scroll to list */
-  #page_data {
+}
+/* scroll to list */
+#page_data {
     overflow: scroll;
     height: 500px;
-  }
-  #myDiv {
+}
+#myDiv {
     z-index: 1;
     margin: 0 auto;
     position: absolute;
     left: 50%;
+}
+#loader-content {
+    z-index: 1;
+    margin: 0 auto;
+    position: absolute;
+    left: 50%;
+}
+.reset-btn {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #fff;
+    border: 1px solid transparent !important;
+    padding: 0.375rem 0.75rem !important;
+    border-radius: 0.25rem !important;
 }

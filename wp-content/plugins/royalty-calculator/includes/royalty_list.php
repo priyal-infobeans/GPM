@@ -5,7 +5,7 @@
          </div>
          <div class="col-6 text-end pt-2">
             <a href="?page=upload_report_data" class="btn btn-sm btn-primary">+Pre Data Collections</a>
-            </div>
+         </div>
       </div>
       <div class="myDiv" style="display:none;">
          <img id="loading-image-greeting-neg" src="<?php echo plugins_url() . '/royalty-calculator/images/loading.gif'; ?>" />
@@ -40,11 +40,17 @@
                         <?php echo $arr['quarter_year'];?>
                      </td>
                      <td>
-                        <?php echo ucfirst($arr['status']);?>
+                        <?php 
+                           if($arr['status']=='processing'){
+                              echo '<span style="color:red">'.ucfirst($arr['status']).'</span>';
+                           } else {
+                              echo '<span>'.ucfirst($arr['status']).'</span>';
+                           }?>
+
                      </td>
                      <td>
-                        <a href="?page=create_quarter_report&id=<?php echo $arr["id"];?>">Edit</a> |
-                           <a href="javascript:void(0)" onclick="delete_selected_report('<?php echo $arr["id"];?>');">Delete</a>
+                        <a href="?page=create_quarter_report&id=<?php echo $arr["id"];?>">Edit</a>
+                           <!-- <a href="javascript:void(0)" onclick="delete_selected_report('<?php echo $arr["id"];?>');">Delete</a> -->
                      </td>
                   </tr>
                   <?php } 

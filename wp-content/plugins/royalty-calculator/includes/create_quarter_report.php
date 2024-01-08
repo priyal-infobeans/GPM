@@ -86,7 +86,9 @@
             </div>
          </div>
          <div class="mb-3 row">
-            <div class="col-2"><input type="button" class="btn btn-secondary" value="Reset"></div>
+            <div class="col-2">
+               <!-- <input type="button" class="btn btn-secondary" value="Reset"> -->
+            <input type="reset" class="reset-btn" value="Reset"></div>
             <div class="col-10">
                <button type="button" class="btn btn-primary" id="saveContentMain">Save & Next</button>
                <div id='loader-content' style='display:none;'>

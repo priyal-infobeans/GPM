@@ -1,4 +1,4 @@
-<div class="container-fluid p-5">
+<div class="container-fluid p-5 upload-report">
       <div class="row mb-3">
          <div class="col-md-12 d-flex">
             <?php if(isset($_GET['id'])){ ?>
