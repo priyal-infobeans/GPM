@@ -12,9 +12,10 @@ function uninstall_royalty_plugin()
 function remove_royalty_table_uninstaller()
 {
   global $wpdb;
-  $x=$sites_arr['blog_id'];
   $shortcode_generator='royalty_report';
   $sql = "DROP TABLE IF EXISTS ".$shortcode_generator;
   $wpdb->query($sql);
+  $sql2 = "DROP TABLE IF EXISTS report_mapping";
+  $wpdb->query($sql2);
   delete_option("my_plugin_db_version");
 }

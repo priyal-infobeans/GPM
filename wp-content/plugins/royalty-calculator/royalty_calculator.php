@@ -24,17 +24,22 @@ register_deactivation_hook(__FILE__, 'uninstall_royalty_plugin');
  */
 function royalty_calculator() {
     global $wpdb;
+    $val = $wpdb->get_results("SELECT * FROM royalty_report", ARRAY_A);
+
     add_menu_page('GPM', 'GPM', 'manage_options', 'royalty-calculator-call-list', 'royalty-calculator-call-list', 'dashicons-screenoptions', 21);
     add_submenu_page('royalty-calculator-call-list', 'All Royalties', 'All Royalties', 'manage_options', 'royalty_calculator_list', 'royalty_calculator_list');
     add_submenu_page('royalty-calculator-call-list', 'Initial Information', 'Initial Information', 'manage_options', 'create_quarter_report', 'create_quarter_report');
-    add_submenu_page('royalty-calculator-call-list', 'Pre Data', 'Pre Data', 'manage_options', 'upload_report_data', 'upload_report_data');
-    if (isset($_GET['preview_id']) || $_GET['page'] == 'content_list') {
+    if($val !== FALSE && !empty($val))
+    {
+        add_submenu_page('royalty-calculator-call-list', 'Pre Data', 'Pre Data', 'manage_options', 'upload_report_data', 'upload_report_data');
+    }
+    if (isset($_GET['preview_id']) || (isset($_GET['page']) && $_GET['page'] == 'content_list')) {
         add_submenu_page('royalty-calculator-call-list', 'Data Information', 'Data Information', 'manage_options', 'content_list', 'content_list');
     }
     if (isset($_GET['report_id'])) {
         add_submenu_page('royalty-calculator-call-list', 'Export & Share', 'Export & Share', 'manage_options', 'file_export', 'file_export');
     }
-    if (isset($_GET['preview_id']) || $_GET['page'] == 'logs_request') {
+    if (isset($_GET['preview_id']) || (isset($_GET['page']) && $_GET['page'] == 'logs_request')) {
         add_submenu_page('royalty-calculator-call-list', 'View Logs', 'View Logs', 'manage_options', 'logs_request', 'view_change_logs');
     }
     add_action('init', 'addcontent');

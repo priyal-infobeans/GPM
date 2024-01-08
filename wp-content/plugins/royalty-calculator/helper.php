@@ -7,7 +7,6 @@ function royalty_calculator_list()
 	require_once(plugin_dir_path(__FILE__) . 'includes/royalty_list.php');	
 }
 
-// add_action('wp_ajax_nopriv_royalty_calculator_list', 'royalty_calculator_list');
 add_action('wp_ajax_royalty_calculator_list', 'royalty_calculator_list');
 
 function content_list()
@@ -20,7 +19,6 @@ function content_list()
 	require_once(plugin_dir_path(__FILE__) . 'includes/content_list.php');
 		
 }
-// add_action('wp_ajax_nopriv_content_list', 'content_list');
 add_action('wp_ajax_content_list', 'content_list');
 
 function preview_list()
@@ -54,7 +52,6 @@ function create_quarter_report()
 	}
 }
 
-// add_action('wp_ajax_nopriv_create_quarter_report', 'create_quarter_report');
 add_action('wp_ajax_create_quarter_report', 'create_quarter_report');
 
 function add_report_data()
@@ -115,6 +112,7 @@ add_action('wp_ajax_delete_selected_report', 'delete_selected_report');
 function upload_report_data()
 {
 	global $wpdb;
+	create_mapping_table();
 	if(isset($_GET['id'])){
 		$id=$_GET['id'];
 		$mapping = $wpdb->get_results("SELECT * FROM report_mapping",ARRAY_A);
@@ -126,7 +124,6 @@ function upload_report_data()
 	}
 }
 
-// add_action('wp_ajax_nopriv_upload_report_data', 'upload_report_data');
 add_action('wp_ajax_upload_report_data', 'upload_report_data');
 
 // Enqueue necessary scripts and styles
@@ -323,7 +320,6 @@ function update_report_logs()
 	foreach ($columnNames as $columnName) {
 		// Use VARCHAR for all columns except 'change_log', which is JSON
 		$dataType = ($columnName === 'change_log') ? 'JSON' : 'VARCHAR(255)';
-		// echo "$columnName $dataType,\n";
 		$sql .= "$columnName $dataType, ";
 	}
 	$sql = rtrim($sql, ", ") . "
@@ -392,23 +388,6 @@ function export_share_report() {
     $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
     $writer->save($filepath);
 
-	// Output file content for download
-    // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-	// 	header("Content-type: application/vnd-ms-excel");
-	//     header('Content-Disposition: attachment;filename="' . $filename . '"');
-	//     // header('Cache-Control: max-age=0');
-	// 	header("Pragma: no-cache");
-	// header("Expires: 0");
-
-	// header("Content-type: application/vnd.ms-excel");
-	// header("Content-Disposition: attachment; filename=\"$filename\"");  
-	// echo plugins_url('/reports/'.$filename, __FILE__);
-	// print $csv_output;
-
-    // readfile($filepath);
-
-    // Delete the file after download
-    // unlink($filepath);
     // Provide download link
     echo '<p>Excel file generated successfully to reports folder. Click to download <a href="' . plugins_url('/reports/'.$filename, __FILE__) . '" download>Download Excel</a></p>';
 	wp_die();
