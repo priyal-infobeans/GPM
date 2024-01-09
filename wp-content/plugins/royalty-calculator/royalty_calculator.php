@@ -63,21 +63,16 @@ function royalty_script_style() {
         wp_enqueue_style('bootstrap-min', plugins_url() . '/royalty-calculator/css/bootstrap.min.css');
         wp_enqueue_style('style-css', plugins_url() . '/royalty-calculator/css/style.css');
         wp_enqueue_script('jquery-js', plugins_url() . '/royalty-calculator/js/jquery-3.6.0.min.js');
-        wp_enqueue_script('checkbox-js', plugins_url() . '/royalty-calculator/js/jquery.simple-checkbox-table.min.js');
         wp_enqueue_script('call-js', plugins_url() . '/royalty-calculator/js/custom-settings.js');
         wp_localize_script('call-js', 'royaltycallajax', array('ajaxurl' => admin_url('admin-ajax.php')));
     }
 
     if ((isset($_GET['page']) && $_GET['page'] == "create_quarter_report") || (isset($_GET['page']) && $_GET['page'] == 'upload_report_data')) {
-        wp_enqueue_script('popper-min', 'https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js', '', '', '', $in_footer = false);
-        wp_enqueue_script('jquery-ui', 'https://code.jquery.com/ui/1.13.1/jquery-ui.js', '', '', '', $in_footer = false);
+        wp_enqueue_script('jquery-ui', plugins_url() . '/royalty-calculator/js/jquery-ui.js', '', '', '', $in_footer = false);
         wp_enqueue_script('bootstrap-min', plugins_url() . '/royalty-calculator/js/bootstrap.min.js', '', '', '', $in_footer = false);
         wp_enqueue_style('bootstrap-min', plugins_url() . '/royalty-calculator/css/bootstrap.min.css');
         wp_enqueue_style('style-css', plugins_url() . '/royalty-calculator/css/style.css');
         wp_enqueue_script('call-js', plugins_url() . '/royalty-calculator/js/custom-settings.js', $in_footer = false);
-        wp_enqueue_style('bootstrap-min', plugins_url() . '/royalty-calculator/js/bootstrap.min.js', '', '', '', $in_footer = false);
-        wp_enqueue_script('popper-min', 'https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js', '', '', '', $in_footer = false);
-        wp_enqueue_script('bootstrap', 'https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js', '', '', '', $in_footer = false);
         wp_localize_script('call-js', 'royaltycallajax', array('ajaxurl' => admin_url('admin-ajax.php')));
     }
 }
