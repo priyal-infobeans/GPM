@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @method royalty_calculator_list
+ * @brief this method is used to load report list.
+ */
 function royalty_calculator_list()
 {
 	global $wpdb;
@@ -9,6 +12,10 @@ function royalty_calculator_list()
 
 add_action('wp_ajax_royalty_calculator_list', 'royalty_calculator_list');
 
+/**
+ * @method content_list
+ * @brief this method is used to load uploaded report list.
+ */
 function content_list()
 {
 	global $wpdb;
@@ -21,6 +28,10 @@ function content_list()
 }
 add_action('wp_ajax_content_list', 'content_list');
 
+/**
+ * @method preview_list
+ * @brief this method is used to view uploaded report preview.
+ */
 function preview_list()
 {
 	global $wpdb;
@@ -37,6 +48,10 @@ function preview_list()
 add_action('wp_ajax_nopriv_preview_list', 'preview_list');
 add_action('wp_ajax_preview_list', 'preview_list');
 
+/**
+ * @method create_quarter_report
+ * @brief this method is used to load/add form to upload quarterly reports.
+ */
 function create_quarter_report()
 {
 	global $wpdb;
@@ -54,6 +69,10 @@ function create_quarter_report()
 
 add_action('wp_ajax_create_quarter_report', 'create_quarter_report');
 
+/**
+ * @method add_report_data
+ * @brief this method is used to fetch royalty report quarter details.
+ */
 function add_report_data()
 {
 	global $wpdb;
@@ -97,6 +116,10 @@ function add_report_data()
 add_action('wp_ajax_nopriv_add_report_data', 'add_report_data');
 add_action('wp_ajax_add_report_data', 'add_report_data');
 
+/**
+ * @method delete_selected_report
+ * @brief this method is used to delete the reports added.
+ */
 function delete_selected_report()
 {
 	global $wpdb;
@@ -109,6 +132,10 @@ function delete_selected_report()
 add_action('wp_ajax_nopriv_delete_selected_report', 'delete_selected_report');
 add_action('wp_ajax_delete_selected_report', 'delete_selected_report');
 
+/**
+ * @method upload_report_data
+ * @brief this method is used to load form to upload all report types and its mapping.
+ */
 function upload_report_data()
 {
 	global $wpdb;
@@ -133,6 +160,10 @@ function enqueue_custom_scripts() {
 }
 add_action('admin_enqueue_scripts', 'enqueue_custom_scripts');
 
+/**
+ * @method mapping_data
+ * @brief this method is used to map report data while uploading files.
+ */
 function mapping_data($report_id, $file, $uploaded_table_name) {
 	global $wpdb;
 
@@ -152,6 +183,10 @@ function mapping_data($report_id, $file, $uploaded_table_name) {
 	return;
 }
 
+/**
+ * @method add_content_data
+ * @brief this method is used to save the uploaded file records.
+ */
 function add_content_data() {
 	global $wpdb;
 	$report_id = isset($_POST['report_id']) ? $_POST['report_id'] : '';
@@ -181,7 +216,10 @@ function add_content_data() {
 add_action('wp_ajax_nopriv_add_content_data', 'add_content_data');
 add_action('wp_ajax_add_content_data', 'add_content_data');
 
-// Handle AJAX request for parsing and importing files
+/**
+ * @method handle_ajax_xlsx_submission
+ * @brief this method is used to handle AJAX request for parsing and importing files.
+ */
 function handle_ajax_xlsx_submission() {
 	if ( ! function_exists( 'wp_handle_upload' ) ) {
 		require_once( ABSPATH . 'wp-admin/includes/file.php' );
@@ -235,7 +273,10 @@ function handle_ajax_xlsx_submission() {
 add_action('wp_ajax_handle_ajax_xlsx_submission', 'handle_ajax_xlsx_submission');
 add_action('wp_ajax_nopriv_handle_ajax_xlsx_submission', 'handle_ajax_xlsx_submission'); // Allow non-logged-in users to access the AJAX endpoint
 
-// Function to upload files in wp uploads folder
+/**
+ * @method upload_file_data
+ * @brief this method is used to upload files in wp uploads folder.
+ */
 function upload_file_data($file) {
 	$upload_dir = wp_upload_dir();
 	$upload_overrides = array( 'test_form' => false );
@@ -243,7 +284,10 @@ function upload_file_data($file) {
 	return $movefile;
 }
 
-// Funtion to rename the report import table
+/**
+ * @method format_report
+ * @brief this method is used to rename the report import table.
+ */
 function format_report($report_id, $file) {
 	global $wpdb;
 	$data = $wpdb->get_row("SELECT * FROM royalty_report WHERE id=".$report_id,ARRAY_A);
@@ -256,7 +300,10 @@ function format_report($report_id, $file) {
 	return $format_report_name;
 }
 
-// Function to create a table with columns from XLSX file first row
+/**
+ * @method create_table
+ * @brief this method is used to create a table with columns from XLSX file first row.
+ */
 function create_table($columns, $tableName) {
     global $wpdb;
 	// Delete table SQL
@@ -272,14 +319,20 @@ function create_table($columns, $tableName) {
 	maybe_create_table( $wpdb->prefix . $tableName, $sql );
 }
 
-// Function to insert data into the created table
+/**
+ * @method insert_data
+ * @brief this method is used to insert data into the created table.
+ */
 function insert_data($data, $tableName) {
     global $wpdb;
     // Insert data into the table
     $wpdb->insert($tableName, $data);
 }
 
-// Function to create mapping table
+/**
+ * @method create_mapping_table
+ * @brief this method is used to create mysql query for mapping table.
+ */
 function create_mapping_table(){
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 	global $wpdb;
@@ -296,6 +349,10 @@ function create_mapping_table(){
 	maybe_create_table( $wpdb->prefix . $tablename, $main_sql_create );
 }
 
+/**
+ * @method update_report_logs
+ * @brief this method is used to manage the logs entry.
+ */
 function update_report_logs()
 {
 	global $wpdb;
@@ -340,6 +397,10 @@ function update_report_logs()
 add_action('wp_ajax_nopriv_update_report_logs', 'update_report_logs');
 add_action('wp_ajax_update_report_logs', 'update_report_logs');
 
+/**
+ * @method file_export
+ * @brief this method is used to include export file.
+ */
 function file_export() {
 	global $wpdb;
 	require_once(plugin_dir_path(__FILE__) . 'includes/file_export.php');
@@ -347,6 +408,10 @@ function file_export() {
 
 add_action('wp_ajax_file_export', 'file_export');
 
+/**
+ * @method export_share_report
+ * @brief this method is used to generate and download excel file.
+ */
 function export_share_report() {
 	global $wpdb;
 	// Load PhpSpreadsheet library
@@ -395,7 +460,10 @@ function export_share_report() {
 add_action('wp_ajax_nopriv_export_share_report', 'export_share_report');
 add_action('wp_ajax_export_share_report', 'export_share_report');
 
-// Create 'reports' directory and set permissions
+/**
+ * @method export_share_report
+ * @brief this method is used to create 'reports' directory and set permissions.
+ */
 function create_reports_directory() {
     $directory_path = plugin_dir_path(__FILE__) . 'reports';
 
@@ -405,6 +473,11 @@ function create_reports_directory() {
         mkdir($directory_path, 0777, true);
     }
 }
+
+/**
+ * @method view_change_logs
+ * @brief this method is used to check all the logs.
+ */
 function view_change_logs() {
 	global $wpdb;
 	$report_id = isset($_GET['preview_id'])?  $_GET['preview_id'] :'';

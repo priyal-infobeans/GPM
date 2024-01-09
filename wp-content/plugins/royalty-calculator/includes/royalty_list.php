@@ -46,7 +46,6 @@
                            } else {
                               echo '<span>'.ucfirst($arr['status']).'</span>';
                            }?>
-
                      </td>
                      <td>
                         <a href="?page=create_quarter_report&id=<?php echo $arr["id"];?>">Edit</a>

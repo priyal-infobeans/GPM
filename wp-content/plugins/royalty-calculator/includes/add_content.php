@@ -4,7 +4,7 @@
             <?php if(isset($_GET['id'])){ ?>
             <h4 class="d-inline-block me-3 mb-0">Edit Royalty Calculations</h4>
          <?php }else{ ?>
-             <h4 class="d-inline-block me-3 mb-0">Royalty Calculations</h4>
+            <h4 class="d-inline-block me-3 mb-0">Royalty Calculations</h4>
         <?php } ?>
          </div>
       </div>
@@ -23,20 +23,20 @@
          <div class="mb-3 row">
             <label for="vimeo_report" class="col-2 col-form-label">Upload Vimeo Report</label>
             <div class="col-8">
-             <input type="file" name="vimeo_report" id="vimeo_report_id">
+               <input type="file" name="vimeo_report" id="vimeo_report_id">
             </div>
          </div>
 
          <div class="mb-3 row">
             <label for="sales_report" class="col-2 col-form-label">Upload Sales Report</label>
             <div class="col-8">
-             <input type="file" name="sales_report" id="sales_report_id">
+               <input type="file" name="sales_report" id="sales_report_id">
             </div>
          </div>
          <div class="mb-3 row">
             <label for="price_report" class="col-2 col-form-label">Upload Price Report</label>
             <div class="col-8">
-             <input type="file" name="price_report" id="price_report_id">
+               <input type="file" name="price_report" id="price_report_id">
             </div>
          </div>
          <div id="importResult"></div>

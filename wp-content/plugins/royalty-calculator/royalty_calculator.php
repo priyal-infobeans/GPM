@@ -39,7 +39,7 @@ function royalty_calculator() {
     if (isset($_GET['report_id'])) {
         add_submenu_page('royalty-calculator-call-list', 'Export & Share', 'Export & Share', 'manage_options', 'file_export', 'file_export');
     }
-    if (isset($_GET['preview_id']) || (isset($_GET['page']) && $_GET['page'] == 'logs_request')) {
+    if (isset($_GET['preview_id']) && (isset($_GET['page']) && $_GET['page'] == 'logs_request')) {
         add_submenu_page('royalty-calculator-call-list', 'View Logs', 'View Logs', 'manage_options', 'logs_request', 'view_change_logs');
     }
     add_action('init', 'addcontent');
@@ -57,6 +57,10 @@ function remove_royalty_submenu() {
 
 add_action('admin_head', 'remove_royalty_submenu');
 
+/**
+ * @method royalty_script_style
+ * @brief this method is used to load necessary scripts and styles in plugin pages.
+ */
 function royalty_script_style() {
     if ((isset($_GET['page']) && $_GET['page'] == "royalty_calculator_list") || (isset($_GET['page']) && $_GET['page'] == 'content_list') || (isset($_GET['page']) && $_GET['page'] == 'file_export')
     || (isset($_GET['page']) && $_GET['page'] == 'logs_request')) {

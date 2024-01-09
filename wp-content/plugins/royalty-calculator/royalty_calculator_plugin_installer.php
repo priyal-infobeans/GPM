@@ -12,7 +12,7 @@ function royalty_calculator_table_installer()
   $databasename = $wpdb->dbname;
   $currentDbName = $wpdb->prefix . $databasename;
   global $currentDbName;
-  // if ($wpdb->get_var("show tables like '$currentDbName'") != $currentDbName) {
+  
   $royalty_report="CREATE TABLE `royalty_report` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `quarter_report_name` varchar(300) DEFAULT NULL,
@@ -23,5 +23,5 @@ function royalty_calculator_table_installer()
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
   dbDelta($royalty_report);
-// }
+
 }
