@@ -494,11 +494,24 @@ add_action('wp_ajax_view_change_logs', 'view_change_logs');
  * @method search_in_excel
  * @brief this method is used to generate and download excel file after the searching calculations.
  */
-function search_in_excel() {
+// function search_in_excel() {
+// 	global $wpdb;
+
+// 	require_once(plugin_dir_path(__FILE__) . 'includes/data_calculations.php');
+// 	wp_die();
+// }
+// add_action('wp_ajax_nopriv_search_in_excel', 'search_in_excel');
+// add_action('wp_ajax_search_in_excel', 'search_in_excel');
+
+/**
+ * @method data_calculation
+ * @brief this method is used to load calculation page.
+ */
+function data_calculation() {
 	global $wpdb;
+	
 	require_once(plugin_dir_path(__FILE__) . 'includes/data_calculations.php');
 	wp_die();
 }
-add_action('wp_ajax_nopriv_search_in_excel', 'search_in_excel');
-add_action('wp_ajax_search_in_excel', 'search_in_excel');
+add_action('wp_ajax_data_calculation', 'data_calculation');
 ?>

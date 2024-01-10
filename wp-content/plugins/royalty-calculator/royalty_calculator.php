@@ -42,7 +42,10 @@ function royalty_calculator() {
     if (isset($_GET['preview_id']) && (isset($_GET['page']) && $_GET['page'] == 'logs_request')) {
         add_submenu_page('royalty-calculator-call-list', 'View Logs', 'View Logs', 'manage_options', 'logs_request', 'view_change_logs');
     }
-    add_submenu_page('royalty-calculator-call-list', 'Data Calculation', 'Data Calculation', 'manage_options', 'data_calculation', 'data_calculation');
+    if ((isset($_GET['page']) && $_GET['page'] == 'data_calculation') && isset($_GET['preview_id'])) {
+        add_submenu_page('royalty-calculator-call-list', 'Data Calculation', 'Data Calculation', 'manage_options', 'data_calculation', 'data_calculation');
+    }
+    
     add_action('init', 'addcontent');
 }
 
@@ -64,7 +67,7 @@ add_action('admin_head', 'remove_royalty_submenu');
  */
 function royalty_script_style() {
     if ((isset($_GET['page']) && $_GET['page'] == "royalty_calculator_list") || (isset($_GET['page']) && $_GET['page'] == 'content_list') || (isset($_GET['page']) && $_GET['page'] == 'file_export')
-    || (isset($_GET['page']) && $_GET['page'] == 'logs_request')) {
+    || (isset($_GET['page']) && $_GET['page'] == 'logs_request') || (isset($_GET['page']) && $_GET['page'] == 'data_calculation')) {
         wp_enqueue_style('bootstrap-min', plugins_url() . '/royalty-calculator/css/bootstrap.min.css');
         wp_enqueue_style('style-css', plugins_url() . '/royalty-calculator/css/style.css');
         wp_enqueue_script('jquery-js', plugins_url() . '/royalty-calculator/js/jquery-3.6.0.min.js');

@@ -20,6 +20,7 @@
                      <th scope="col" width="10%">Loads</th>
                      <th scope="col" width="30%">Name</th>
                      <th scope="col" width="10%">Viewers</th>
+                     <th scope="col" width="5%">SKU</th>
                      <th scope="col" width="10%">Action</th>
                   </tr>
                </thead>
@@ -32,16 +33,19 @@
                         <?php echo $arr['id'];?>
                      </td>
                      <td class="editableColumns">
-                        <?php echo $arr['plays'];?>
+                        <?php echo !empty($arr['plays']) ? $arr['plays'] : '';?>
                      </td>
                      <td class="editableColumns">
-                        <?php echo $arr['loads'];?>
+                        <?php echo !empty($arr['loads']) ? $arr['loads'] : '';?>
                      </td>
                      <td class="editableColumns">
-                        <?php echo $arr['name'];?>
+                        <?php echo !empty($arr['name']) ? $arr['name'] : '';?>
                      </td>
                      <td class="editableColumns">
-                        <?php echo $arr['unique_viewers'];?>
+                        <?php echo !empty($arr['unique_viewers']) ? $arr['unique_viewers'] : '';?>
+                     </td>
+                     <td class="editableColumns">
+                        <?php echo !empty($arr['sku']) ? $arr['sku'] : '';?>
                      </td>
                      <td>
                         <a href="javascript:void(0);" class="editValues">Edit</a>
