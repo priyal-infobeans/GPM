@@ -226,9 +226,10 @@ function handle_ajax_xlsx_submission() {
 	}
     $file = $_FILES['file'];
 	$report_id = isset($_POST['report_id']) ? $_POST['report_id'] : '';
+	$file_type = isset($_POST['file_type']) ? $_POST['file_type'] : '';
 	// Upload the selected files
 	$movefile = upload_file_data($file);
-	$uploaded_table_name = format_report($report_id, $file['name']);
+	$uploaded_table_name = format_report($report_id, $file_type);//($report_id, $file['name'])
     if ($file['error'] === UPLOAD_ERR_OK) {
 		$filePath = $movefile['file'];
 
@@ -294,7 +295,7 @@ function format_report($report_id, $file) {
 	$report_name = strtolower(str_replace(' ', '_', $data['quarter_report_name']));
 	$report_quarter = $data['quarter'];
 	$report_year = $data['quarter_year'];
-	$file_split = explode(' ', $file);
+	$file_split = explode('_', $file);//explode(' ', $file);
 	$rename_file = strtolower(reset($file_split));
 	$format_report_name = $report_name.'_'.$report_quarter.'_'.$report_year.'_'.$rename_file;
 	return $format_report_name;
@@ -488,4 +489,16 @@ function view_change_logs() {
 		
 }
 add_action('wp_ajax_view_change_logs', 'view_change_logs');
+
+/**
+ * @method search_in_excel
+ * @brief this method is used to generate and download excel file after the searching calculations.
+ */
+function search_in_excel() {
+	global $wpdb;
+	require_once(plugin_dir_path(__FILE__) . 'includes/data_calculations.php');
+	wp_die();
+}
+add_action('wp_ajax_nopriv_search_in_excel', 'search_in_excel');
+add_action('wp_ajax_search_in_excel', 'search_in_excel');
 ?>

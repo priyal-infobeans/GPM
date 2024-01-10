@@ -76,9 +76,10 @@ $(document).on('click', '#saveContentMain', function ()
 });
 $(document).on('change', '#vimeo_report_id, #sales_report_id, #price_report_id', function ()
  {
+	var inputName = $(this).attr('name'); // Get the "name" attribute value
 	var file = this.files[0];
 	if (file) {
-		parseAndImportFile(file);
+		parseAndImportFile(file, inputName);
 	}
 });
 $(document).on('click', '#savecontentdata', function ()
@@ -174,11 +175,12 @@ $(document).on('click', '.saveBtn', function () {
 		}
 	});
 });
-function parseAndImportFile(file){
+function parseAndImportFile(file, fileInputName){
 	var report_type = $("#report_type").val();
 	var formData = new FormData();
 	formData.append('file', file);
 	formData.append('report_id', report_type);
+	formData.append('file_type', fileInputName);
 	formData.append('action', 'handle_ajax_xlsx_submission');
 	$.ajax({
 		url: royaltycallajax.ajaxurl,
@@ -272,4 +274,24 @@ function delete_content_data(id)
 			}
 		});
 	}
+}
+function search_in_excel(report_id, data_id){
+	$.ajax({
+		url: royaltycallajax.ajaxurl,
+		method: 'post',
+		data: { 
+			action: 'search_in_excel',
+			data_id: data_id,
+			report_id: report_id,
+		},                     
+		beforeSend: function ()
+		{
+			$("#loader-content").css('display', '');
+		},
+		success: function(response){
+			// $('#exportResult').html(response);
+
+		}
+	});
+	// window.location.replace(origin + pathname + '?page=data_calculation&preview_id='+report_id+'&id='+data_id);
 }

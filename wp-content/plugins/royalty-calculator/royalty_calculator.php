@@ -42,6 +42,7 @@ function royalty_calculator() {
     if (isset($_GET['preview_id']) && (isset($_GET['page']) && $_GET['page'] == 'logs_request')) {
         add_submenu_page('royalty-calculator-call-list', 'View Logs', 'View Logs', 'manage_options', 'logs_request', 'view_change_logs');
     }
+    add_submenu_page('royalty-calculator-call-list', 'Data Calculation', 'Data Calculation', 'manage_options', 'data_calculation', 'data_calculation');
     add_action('init', 'addcontent');
 }
 
