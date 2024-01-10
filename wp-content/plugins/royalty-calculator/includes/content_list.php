@@ -42,6 +42,7 @@
                      <th scope="col" width="10%">Loads</th>
                      <th scope="col" width="30%">Name</th>
                      <th scope="col" width="10%">Viewers</th>
+                     <th scope="col" width="5%">SKU</th>
                      <!-- <th scope="col" width="10%">Action</th> -->
                   </tr>
                </thead>
@@ -54,16 +55,19 @@
                         <?php echo $arr['id'];?>
                      </td>
                      <td>
-                        <?php echo $arr['plays'];?>
+                        <?php echo !empty($arr['plays']) ? $arr['plays'] : '-';?>
                      </td>
                      <td>
-                        <?php echo $arr['loads'];?>
+                        <?php echo !empty($arr['loads']) ? $arr['loads'] : '-';?>
                      </td>
                      <td>
-                        <?php echo $arr['name'];?>
+                        <?php echo !empty($arr['name']) ? $arr['name'] : '-';?>
                      </td>
                      <td>
-                        <?php echo $arr['unique_viewers'];?>
+                        <?php echo !empty($arr['unique_viewers']) ? $arr['unique_viewers'] : '-';?>
+                     </td>
+                     <td>
+                        <?php echo !empty($arr['sku']) ? $arr['sku'] : '-';?>
                      </td>
                      <!-- <td>
                            <a href="?page=create_content&id=<?php echo $arr["id"];?>">Edit</a> |

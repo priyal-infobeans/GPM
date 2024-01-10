@@ -212,19 +212,19 @@ function previewList(file_type, btn_val)
 	var report_id = $('#report_id').val();
 	// AJAX Request
 	$.ajax({
-	url: royaltycallajax.ajaxurl,
-	method: 'POST',
-	data: { 
-		action: 'preview_list',
-		report_id: report_id,
-		file_type: file_type,
-		btn_value: btn_val,
-	},
-	success: function(response){
-		$("#myDiv").css('display', 'none');
-		$('.tmp_preview_list').css('opacity', '');
-		$('.tmp_preview_list').html(response);
-	}
+		url: royaltycallajax.ajaxurl,
+		method: 'POST',
+		data: { 
+			action: 'preview_list',
+			report_id: report_id,
+			file_type: file_type,
+			btn_value: btn_val,
+		},
+		success: function(response){
+			$("#myDiv").css('display', 'none');
+			$('.tmp_preview_list').css('opacity', '');
+			$('.tmp_preview_list').html(response);
+		}
 	});
 }
 

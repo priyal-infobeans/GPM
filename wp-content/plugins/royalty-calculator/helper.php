@@ -39,7 +39,7 @@ function preview_list()
 	$shortcode=$wpdb->get_results("SELECT * FROM report_mapping where report_id=$report_id",ARRAY_A);
 	$file_type = isset($_POST['file_type'])? $_POST['file_type'] :'';
 	$btn_value = isset($_POST['btn_value'])? $_POST['btn_value'] :'';
-	$table_name = format_report($report_id, $file_type);
+	$table_name = format_report($report_id, $btn_value);//($report_id, $file_type)
 	$export_record = $wpdb->get_results("SELECT * FROM $table_name",ARRAY_A);
 	require_once(plugin_dir_path(__FILE__) . 'includes/content_list.php');
 	json_encode(array('status' => "success",'result'=>$export_record));
