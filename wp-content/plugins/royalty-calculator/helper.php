@@ -3,6 +3,7 @@
  * @method royalty_calculator_list
  * @brief this method is used to load report list.
  */
+use PhpOffice\PhpSpreadsheet\IOFactory;
 function royalty_calculator_list()
 {
 	global $wpdb;
@@ -510,8 +511,113 @@ add_action('wp_ajax_view_change_logs', 'view_change_logs');
 function data_calculation() {
 	global $wpdb;
 	
+	$upl = wp_get_upload_dir();
+	// echo '<pre>';print_r($upl);
+	// echo $upl['url'];
+	// usage
+	// echo $upl['basedir'].$upl['subdir'].'/only-skus-8.xlsx';
+$dataForSearchPath = $upl['basedir'].$upl['subdir'].'/only-skus-8.xlsx';///var/www/html/GPM/wp-content/uploads/2024/01/only-skus-8.xls
+;
+$columnForSearch = 1; // Assuming SKU is in the first column
+$dataToSearchPath = $upl['basedir'].$upl['subdir'].'/sku-with-title-1.xls';
+$columnToSearch = 'A'; // Assuming Titles are in the second column
+// vlookup2($dataForSearchPath, $columnForSearch, $dataToSearchPath, $columnToSearch);
+
+$tableNameForSearch = 'calc_q1_2024_vimeo';
+$columnForSearch = 'sku';
+$tableNameToSearch = 'calc_q1_2024_sales';
+$columnToSearch = 'Title';
+
+vlookupWithWPDB($tableNameForSearch, $columnForSearch, $tableNameToSearch, $columnToSearch);
 	require_once(plugin_dir_path(__FILE__) . 'includes/data_calculations.php');
 	wp_die();
 }
 add_action('wp_ajax_data_calculation', 'data_calculation');
+
+/**
+ * @method vlookup
+ * @brief this method is used to search from within excel files.
+ */
+function vlookup2($dataForSearchPath, $columnForSearch, $dataToSearchPath, $columnToSearch)
+{
+	require_once (plugin_dir_path(__FILE__) . 'PhpSpreadsheet/vendor/autoload.php');
+    // ini_set('memory_limit', '256M'); // Adjust the memory limit as needed
+
+    $spreadsheetForSearch = IOFactory::load($dataForSearchPath);
+    $worksheetForSearch = $spreadsheetForSearch->getActiveSheet();
+
+    $spreadsheetToSearch = IOFactory::load($dataToSearchPath);
+    $worksheetToSearch = $spreadsheetToSearch->getActiveSheet();
+
+    // Get the highest row number in the search column of dataForSearch
+    $highestRowForSearch = $worksheetForSearch->getHighestRow();
+	print_r($highestRowForSearch);
+    // Process data in chunks
+    $chunkSize = 1000;
+    for ($startRow = 2; $startRow <= $highestRowForSearch; $startRow += $chunkSize) {
+        $endRow = min($startRow + $chunkSize - 1, $highestRowForSearch);
+
+        // Iterate through the search column in dataForSearch for the current chunk
+        for ($row = $startRow; $row <= $endRow; $row++) {
+            $skuValue = $worksheetForSearch->getCellByColumnAndRow($columnForSearch, $row)->getValue();
+
+            // Iterate through the search column in dataToSearch
+            foreach ($worksheetToSearch->getColumnIterator() as $titleColumn) {
+                if ($titleColumn->getColumnIndex() === $columnToSearch) {
+                    foreach ($titleColumn->getCellIterator() as $titleCell) {
+                        $title = $titleCell->getValue();
+
+                        // Check if the SKU is found in the Title
+                        if (!empty($skuValue) && (strpos($title, $skuValue) !== false)) {
+                            // Match found
+                            // echo "SKU: $skuValue matches Title: $title\n";
+                        }
+                    }
+                }
+            }
+        }
+        // handling crashes:Clear PHPExcel object cache to release memory
+        $spreadsheetForSearch->disconnectWorksheets();
+        $spreadsheetToSearch->disconnectWorksheets();
+    }
+}
+
+function vlookupWithWPDB($tableNameForSearch, $columnForSearch, $tableNameToSearch, $columnToSearch)
+{
+    global $wpdb;
+
+    // Query to retrieve SKU values from tableForSearch
+    $queryForSearch = $wpdb->prepare("SELECT %i FROM %i", $columnForSearch, $tableNameForSearch);
+	// print_r($queryForSearch);
+    $skuValues = $wpdb->get_col($queryForSearch);
+// print_r($skuValues);
+    // Initialize the counter
+    $matchesCount = 0;
+
+    // Iterate through SKU values
+    // foreach ($skuValues as $skuValue) {
+	for($i=0;$i<count($skuValues);$i++){
+		// echo $skuValues[$i];
+        // Query to search for matching titles in tableToSearch
+		$searched_val = '%' . $skuValues[$i] . '%';
+        $queryToSearch = $wpdb->prepare("SELECT %i FROM %i WHERE %i LIKE %s", $columnToSearch, $tableNameToSearch, $columnToSearch, $searched_val);
+		// print_r($queryToSearch);
+        $matchingTitles = $wpdb->get_col($queryToSearch);
+
+		// echo count($matchingTitles);
+        // Increment the counter based on the number of matches
+		
+        $matchesCount += count($matchingTitles);
+		echo "Total Matches Found: $matchesCount\n";
+        // Iterate through matching titles
+        foreach ($matchingTitles as $title) {
+            // Match found
+            echo "SKU: $skuValues[$i] matches Title: $title";
+			
+        }
+    }
+
+    // Display the count of matches found
+    echo "Total Matches Found: $matchesCount";
+}
 ?>
