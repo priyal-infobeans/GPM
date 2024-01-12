@@ -65,7 +65,7 @@
    </div>
    <div class="col-6 pt-2">
          <button type="button" id="save_next" class="btn btn-sm btn-dark" onclick="window.location.href='<?php echo admin_url();?>admin.php?page=logs_request&preview_id=<?php echo $_GET['preview_id']?>'">View Change Logs</button>
-         <button type="button" id="search_in_excel" class="btn btn-sm btn-dark" onclick="search_in_excel(<?php echo $report_id?>, <?php echo $shortcode[0]['id']?>)">Search In Excel</button>
+         <button type="button" id="search_in_excel" class="btn btn-sm btn-dark" onclick="search_in_excel(<?php echo $report_id?>, <?php echo $shortcode[0]['id']?>,'sales')">Search In Excel</button>
    </div>
    <input type='hidden' name="report_id" id="report_id" value="<?php echo $_GET['preview_id']?>">
    <input type='hidden' name="report_name" id="report_name" value="<?php echo $table_name;?>">

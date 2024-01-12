@@ -275,24 +275,6 @@ function delete_content_data(id)
 		});
 	}
 }
-function search_in_excel(report_id, data_id){
-	window.location.replace(origin + pathname + '?page=data_calculation&preview_id='+report_id+'&id='+data_id);
-	// $.ajax({
-	// 	url: royaltycallajax.ajaxurl,
-	// 	method: 'post',
-	// 	data: { 
-	// 		action: 'search_in_excel',
-	// 		data_id: data_id,
-	// 		report_id: report_id,
-	// 	},                     
-	// 	beforeSend: function ()
-	// 	{
-	// 		$("#loader-content").css('display', '');
-	// 	},
-	// 	success: function(response){
-	// 		console.log(response);
-	// 		// $('#exportResult').html(response);
-
-	// 	}
-	// });
+function search_in_excel(report_id, data_id, type){
+	window.location.replace(origin + pathname + '?page=data_calculation&preview_id='+report_id+'&id='+data_id+'&type='+type);
 }

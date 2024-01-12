@@ -492,43 +492,20 @@ function view_change_logs() {
 add_action('wp_ajax_view_change_logs', 'view_change_logs');
 
 /**
- * @method search_in_excel
- * @brief this method is used to generate and download excel file after the searching calculations.
- */
-// function search_in_excel() {
-// 	global $wpdb;
-
-// 	require_once(plugin_dir_path(__FILE__) . 'includes/data_calculations.php');
-// 	wp_die();
-// }
-// add_action('wp_ajax_nopriv_search_in_excel', 'search_in_excel');
-// add_action('wp_ajax_search_in_excel', 'search_in_excel');
-
-/**
  * @method data_calculation
- * @brief this method is used to load calculation page.
+ * @brief this method is used to load calculation page and generate and download excel file after the searching calculations.
  */
 function data_calculation() {
 	global $wpdb;
-	
-	$upl = wp_get_upload_dir();
-	// echo '<pre>';print_r($upl);
-	// echo $upl['url'];
-	// usage
-	// echo $upl['basedir'].$upl['subdir'].'/only-skus-8.xlsx';
-$dataForSearchPath = $upl['basedir'].$upl['subdir'].'/only-skus-8.xlsx';///var/www/html/GPM/wp-content/uploads/2024/01/only-skus-8.xls
-;
-$columnForSearch = 1; // Assuming SKU is in the first column
-$dataToSearchPath = $upl['basedir'].$upl['subdir'].'/sku-with-title-1.xls';
-$columnToSearch = 'A'; // Assuming Titles are in the second column
-// vlookup2($dataForSearchPath, $columnForSearch, $dataToSearchPath, $columnToSearch);
-
-$tableNameForSearch = 'calc_q1_2024_vimeo';
-$columnForSearch = 'sku';
-$tableNameToSearch = 'calc_q1_2024_sales';
-$columnToSearch = 'Title';
-
-vlookupWithWPDB($tableNameForSearch, $columnForSearch, $tableNameToSearch, $columnToSearch);
+	$report_id = isset($_GET['preview_id']) ? $_GET['preview_id'] : '';
+	$data_id = isset($_GET['id']) ? $_GET['id'] : '';
+	$type = isset($_GET['type']) ? $_GET['type'] : '';
+	$table_for_search = $wpdb->get_row("SELECT report_name FROM report_mapping WHERE id=".$data_id." and report_id=".$report_id,ARRAY_A);
+	$table_to_search = $wpdb->get_row("SELECT report_name FROM report_mapping WHERE report_id=".$report_id." and report_name LIKE '%".$type."%'",ARRAY_A);
+	$columnForSearch = 'sku';
+	$tableNameToSearch = 'calc_q1_2024_sales';
+	$columnToSearch = 'Title';
+	$filename = vlookup($table_for_search['report_name'], $columnForSearch, $table_to_search['report_name'], $columnToSearch);
 	require_once(plugin_dir_path(__FILE__) . 'includes/data_calculations.php');
 	wp_die();
 }
@@ -538,86 +515,68 @@ add_action('wp_ajax_data_calculation', 'data_calculation');
  * @method vlookup
  * @brief this method is used to search from within excel files.
  */
-function vlookup2($dataForSearchPath, $columnForSearch, $dataToSearchPath, $columnToSearch)
-{
-	require_once (plugin_dir_path(__FILE__) . 'PhpSpreadsheet/vendor/autoload.php');
-    // ini_set('memory_limit', '256M'); // Adjust the memory limit as needed
-
-    $spreadsheetForSearch = IOFactory::load($dataForSearchPath);
-    $worksheetForSearch = $spreadsheetForSearch->getActiveSheet();
-
-    $spreadsheetToSearch = IOFactory::load($dataToSearchPath);
-    $worksheetToSearch = $spreadsheetToSearch->getActiveSheet();
-
-    // Get the highest row number in the search column of dataForSearch
-    $highestRowForSearch = $worksheetForSearch->getHighestRow();
-	print_r($highestRowForSearch);
-    // Process data in chunks
-    $chunkSize = 1000;
-    for ($startRow = 2; $startRow <= $highestRowForSearch; $startRow += $chunkSize) {
-        $endRow = min($startRow + $chunkSize - 1, $highestRowForSearch);
-
-        // Iterate through the search column in dataForSearch for the current chunk
-        for ($row = $startRow; $row <= $endRow; $row++) {
-            $skuValue = $worksheetForSearch->getCellByColumnAndRow($columnForSearch, $row)->getValue();
-
-            // Iterate through the search column in dataToSearch
-            foreach ($worksheetToSearch->getColumnIterator() as $titleColumn) {
-                if ($titleColumn->getColumnIndex() === $columnToSearch) {
-                    foreach ($titleColumn->getCellIterator() as $titleCell) {
-                        $title = $titleCell->getValue();
-
-                        // Check if the SKU is found in the Title
-                        if (!empty($skuValue) && (strpos($title, $skuValue) !== false)) {
-                            // Match found
-                            // echo "SKU: $skuValue matches Title: $title\n";
-                        }
-                    }
-                }
-            }
-        }
-        // handling crashes:Clear PHPExcel object cache to release memory
-        $spreadsheetForSearch->disconnectWorksheets();
-        $spreadsheetToSearch->disconnectWorksheets();
-    }
-}
-
-function vlookupWithWPDB($tableNameForSearch, $columnForSearch, $tableNameToSearch, $columnToSearch)
+function vlookup($tableNameForSearch, $columnForSearch, $tableNameToSearch, $columnToSearch)
 {
     global $wpdb;
-
+	// Load PhpSpreadsheet library
+	require_once (plugin_dir_path(__FILE__) . 'PhpSpreadsheet/vendor/autoload.php');
     // Query to retrieve SKU values from tableForSearch
     $queryForSearch = $wpdb->prepare("SELECT %i FROM %i", $columnForSearch, $tableNameForSearch);
-	// print_r($queryForSearch);
+
     $skuValues = $wpdb->get_col($queryForSearch);
-// print_r($skuValues);
-    // Initialize the counter
-    $matchesCount = 0;
+
+	// Initialize array to store matching results
+    $matchingResults = [];
 
     // Iterate through SKU values
-    // foreach ($skuValues as $skuValue) {
 	for($i=0;$i<count($skuValues);$i++){
-		// echo $skuValues[$i];
-        // Query to search for matching titles in tableToSearch
 		$searched_val = '%' . $skuValues[$i] . '%';
         $queryToSearch = $wpdb->prepare("SELECT %i FROM %i WHERE %i LIKE %s", $columnToSearch, $tableNameToSearch, $columnToSearch, $searched_val);
-		// print_r($queryToSearch);
         $matchingTitles = $wpdb->get_col($queryToSearch);
 
-		// echo count($matchingTitles);
-        // Increment the counter based on the number of matches
-		
-        $matchesCount += count($matchingTitles);
-		echo "Total Matches Found: $matchesCount\n";
-        // Iterate through matching titles
-        foreach ($matchingTitles as $title) {
-            // Match found
-            echo "SKU: $skuValues[$i] matches Title: $title";
-			
-        }
-    }
+		 // Count the number of matches
+		 $matchesCount = count($matchingTitles);
 
-    // Display the count of matches found
-    echo "Total Matches Found: $matchesCount";
+		 if ($matchesCount > 0) {
+            $matchingResults[] = [
+                'title' => implode(', ', $matchingTitles),
+                'matching_sku' => $skuValues[$i],
+                'count' => $matchesCount,
+            ];
+        	}
+		}
+
+		// Create a new PhpSpreadsheet instance
+		$spreadsheet = new PhpOffice\PhpSpreadsheet\Spreadsheet();
+		$sheet = $spreadsheet->getActiveSheet();
+	
+		// Set headers
+		$sheet->setCellValue('A1', 'Title');
+		$sheet->setCellValue('B1', 'Matching SKU');
+		$sheet->setCellValue('C1', 'Count');
+	
+		// Populate data
+		$row = 2;
+		foreach ($matchingResults as $result) {
+			$sheet->setCellValue('A' . $row, $result['title']);
+			$sheet->setCellValue('B' . $row, $result['matching_sku']);
+			$sheet->setCellValue('C' . $row, $result['count']);
+			$row++;
+		}
+
+		$writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+		// Save Excel file
+		$filename = 'calculation_export_' . date('YmdHis') . '.xlsx';
+		$filepath = plugin_dir_path(__FILE__) . 'reports/'.$filename;
+		
+		$writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+		$writer->save($filepath);
+
+		$file = plugins_url("/reports/".$filename, __FILE__);
+		echo '<div class="container-fluid p-5">
+		<div class="row mb-3">
+		  <a class="btn btn-sm btn-primary" href="'.$file.'">Download Calculation Sheet</a>
+		</div>
+	</div>';
 }
 ?>
